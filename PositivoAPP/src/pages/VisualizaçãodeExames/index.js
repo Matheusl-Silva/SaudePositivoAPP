@@ -1,0 +1,49 @@
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
+import Header from '../../components/Header'
+import Listagem from '../../components/ListagemDeExames'
+
+export default function VisualizacaoExames() {
+
+
+  return (
+    <SafeAreaView style={styles.container}>
+
+      <Header />
+
+      {/* Botão nova liberação */}
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>SOLICITAR NOVO EXAME</Text>
+      </TouchableOpacity>
+
+      {/* Consultar liberações */}
+      <View style={styles.consultar}>
+        <Text style={styles.consultarText}>Consultar exames:</Text>
+        <TouchableOpacity>
+          <Text style={styles.pesquisarText}>Pesquisar</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Listagem />
+      
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#fff", padding: 16, marginTop: 20 },
+  button: {
+    backgroundColor: "#008c3a",
+    padding: 14,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  buttonText: { color: "#fff", fontWeight: "bold" },
+  consultar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  consultarText: { fontSize: 16, fontWeight: "bold" },
+  pesquisarText: { fontSize: 16, color: "#008c3a" },
+});
