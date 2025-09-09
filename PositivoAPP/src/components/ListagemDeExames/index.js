@@ -45,7 +45,7 @@ export default function Listagem() {
                                         : styles.badgeTextPendente
                                 }
                             >
-                                {item.autorizado ? "AUTORIZADO" : "PENDENTE"}
+                                {item.autorizado ? "FINALIZADO" : "EM ANDAMENTO"}
                             </Text>
                         </View>
                         <Text style={styles.responsavel}>Responsável: {item.responsavel}</Text>

@@ -32,7 +32,7 @@ export default function VisualizacaoExames() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 16, marginTop: 20 },
   button: {
-    backgroundColor: "#008c3a",
+    backgroundColor: "#3d80fdff",
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
@@ -45,5 +45,5 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   consultarText: { fontSize: 16, fontWeight: "bold" },
-  pesquisarText: { fontSize: 16, color: "#008c3a" },
+  pesquisarText: { fontSize: 16, color: "#1827ffff" },
 });
