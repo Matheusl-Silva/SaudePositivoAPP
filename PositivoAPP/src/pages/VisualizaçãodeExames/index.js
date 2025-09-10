@@ -10,11 +10,6 @@ export default function VisualizacaoExames() {
 
       <Header />
 
-      {/* Botão nova liberação */}
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>SOLICITAR NOVO EXAME</Text>
-      </TouchableOpacity>
-
       {/* Consultar liberações */}
       <View style={styles.consultar}>
         <Text style={styles.consultarText}>Consultar exames:</Text>
@@ -31,14 +26,6 @@ export default function VisualizacaoExames() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 16, marginTop: 20 },
-  button: {
-    backgroundColor: "#3d80fdff",
-    padding: 14,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  buttonText: { color: "#fff", fontWeight: "bold" },
   consultar: {
     flexDirection: "row",
     justifyContent: "space-between",
