@@ -85,9 +85,27 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginBottom: 6,
   },
-  badgeTextAutorizado: { color: "#008c3a", fontWeight: "bold", fontSize: 12 },
-  badgeTextPendente: { color: "#ffda07ff", fontWeight: "bold", fontSize: 12 },
-  responsavel: { fontWeight: "bold", marginBottom: 6 },
-  infoBox: { backgroundColor: "#f9f9f9", padding: 8, borderRadius: 6 },
-  info: { fontSize: 14, color: "#333", marginBottom: 4 },
+  badgeTextAutorizado: { 
+    color: "#008c3a", 
+    fontWeight: "bold", 
+    fontSize: 12 
+  },
+  badgeTextPendente: { 
+    color: "#ffda07ff", 
+    fontWeight: "bold", 
+    fontSize: 12 
+  },
+  responsavel: { 
+    fontWeight: "bold", 
+    marginBottom: 6 
+  },
+  infoBox: { 
+    backgroundColor: "#f9f9f9", 
+    padding: 8, borderRadius: 6 
+  },
+  info: { 
+    fontSize: 14, 
+    color: "#333",
+    marginBottom: 4 
+  },
 });

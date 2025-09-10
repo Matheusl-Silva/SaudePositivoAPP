@@ -31,6 +31,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 12,
   },
-  consultarText: { fontSize: 16, fontWeight: "bold" },
-  pesquisarText: { fontSize: 16, color: "#1827ffff" },
+  consultarText: { 
+    fontSize: 16, 
+    fontWeight: "bold" 
+  },
+  pesquisarText: { 
+    fontSize: 16, 
+    color: "#1827ffff" 
+  },
 });
