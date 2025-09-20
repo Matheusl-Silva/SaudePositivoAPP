@@ -6,10 +6,15 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import Listagem from "../../components/ListagemDeExames"
 
 export default function Home({ nome = "Default" }) {
+
+  const navigation = useNavigation();
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <Ionicons name="medical" size={32} color="#1827ff" />
         <Text style={styles.headerTitle}>Saúde Positivo</Text>
@@ -18,34 +23,16 @@ export default function Home({ nome = "Default" }) {
       <View style={styles.welcomeContainer}>
         <Text style={styles.welcomeText}>Olá, {nome}</Text>
         <Text style={styles.subtitleText}>
-          Escolha uma das opções abaixo para continuar
+          Consulte seus resultados de exames.
         </Text>
       </View>
 
-      <View style={styles.cardsContainer}>
-            <TouchableOpacity style={styles.card}>
-            <Ionicons name="document-text-outline" size={40} color="#1827ff" />
-            <Text style={styles.cardTitle}>Visualizar Resultados</Text>
-            <Text style={styles.cardSubtitle}>
-                Acesse seus exames e laudos médicos
-            </Text>
-            </TouchableOpacity>
+      <Listagem />
 
-            <TouchableOpacity style={styles.card}>
-            <Ionicons name="person-circle-outline" size={40} color="#1827ff" />
-            <Text style={styles.cardTitle}>Alterar Dados</Text>
-            <Text style={styles.cardSubtitle}>
-                Atualize suas informações pessoais
-            </Text>
-            </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        style={styles.exitButton}
-      >
+      <TouchableOpacity style={styles.exitButton} onPress={() => navigation.navigate("Login")}>
         <Text style={styles.exitButtonText}>Sair</Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 }
 
