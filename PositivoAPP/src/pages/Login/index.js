@@ -9,22 +9,20 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [CPF, setCPF] = useState("");
   const [dataNascimento, setDataNascimento] = useState("");
+  const navigation = useNavigation();
 
   const handleLogin = () => {
-    if (!email || !dataNascimento) {
+    if (!CPF || !dataNascimento) {
       Alert.alert("Erro", "Por favor, preencha todos os campos");
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Alert.alert("Erro", "Por favor, insira um email válido");
-      return;
-    }
+    navigation.navigate("Home");
   };
 
   const formatarData = (text) => {
@@ -42,6 +40,24 @@ export default function Login() {
     }
   };
 
+  const formatarCPF = (text) => {
+  const numeros = text.replace(/\D/g, "");
+
+  if (numeros.length <= 3) {
+    return numeros;
+  } else if (numeros.length <= 6) {
+    return `${numeros.slice(0, 3)}.${numeros.slice(3)}`;
+  } else if (numeros.length <= 9) {
+    return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6)}`;
+  } else {
+    return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(
+      6,
+      9
+    )}-${numeros.slice(9, 11)}`;
+  }
+};
+
+
   const handleDataChange = (text) => {
     const formatted = formatarData(text);
     if (formatted.length <= 10) {
@@ -50,9 +66,9 @@ export default function Login() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <Ionicons name="medical" size={32} color="#1827ffff" />
+        <Ionicons name="medical" size={32} color="#1827ff" />
         <Text style={styles.headerTitle}>Saúde Positivo</Text>
       </View>
 
@@ -63,7 +79,7 @@ export default function Login() {
         </Text>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>CPF</Text>
           <View style={styles.inputWrapper}>
             <Ionicons
               name="mail-outline"
@@ -73,10 +89,11 @@ export default function Login() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Digite seu email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
+              placeholder="Digite seu CPF"
+              value={CPF}
+              onChangeText={(text) => setCPF(formatarCPF(text))}
+              keyboardType="numeric"
+              maxLength={14}
               autoCapitalize="none"
               autoCorrect={false}
             />
@@ -107,7 +124,7 @@ export default function Login() {
           <Text style={styles.loginButtonText}>Entrar</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
