@@ -1,36 +1,40 @@
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-
-export default function Header(){
-    return(
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Ionicons name="arrow-back" size={24} color="#000" />
-                <Text style={styles.headerTitle}>Exames realizados</Text>
-            </View>
-            <View style={styles.userBox}>
-                <Ionicons name="person-circle-outline" size={32} color="#aaa" />
-                <View style={{ marginLeft: 10 }}>
-                    <Text style={styles.userName}>Gabriel de Castro Juliati</Text>
-                </View>
-            </View>
-        </View>
-    )
+export default function Header({ nomeUsuario = "Usuário" }) {
+  return (
+    <View style={styles.container}>
+      <View style={styles.containerLogo}>
+        <Ionicons name="medical" size={24} color="#1827ff" />
+        <Text style={styles.textLogo}>Saúde Positivo</Text>
+      </View>
+      <Text style={styles.textUser}> Olá, <Text style={{fontWeight: 'bold'}}>{nomeUsuario}</Text></Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: "row", alignItems: "center", marginBottom: 16 },
-  headerTitle: { fontSize: 20, fontWeight: "bold", marginLeft: 12 },
-  userBox: {
+  container: {
     flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f8f8f8",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 16,
+    backgroundColor: "#fff",
+    justifyContent: "space-between",
+    alignItems: "flex-center",
+    paddingHorizontal: 30,
+    paddingVertical: 30,
+    borderBottomWidth: 3,
+    borderColor: '#777'
   },
-  userName: { fontSize: 16, fontWeight: "bold" },
-  userCard: { fontSize: 14, color: "#666" },
-
+  containerLogo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  textLogo: {
+    color: "#1827ff",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginLeft: 12,
+  },
+  textUser: {
+    fontSize: 18}
 });
