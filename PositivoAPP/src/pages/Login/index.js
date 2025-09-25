@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -5,16 +6,18 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from "react-native";
-import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import api from "../../services/api";
 
 export default function Login() {
   const [userType, setUserType] = useState("paciente");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
-  const [password, setPassword] = useState("");
+  const [senha, setSenha] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   const formatarCPF = (text) => {
@@ -32,25 +35,29 @@ export default function Login() {
     )}-${numeros.slice(9, 11)}`;
   };
 
-  const handleLogin = () => {
-    if (userType === "paciente") {
-      if (!email || !cpf) {
-        Alert.alert("Erro", "Por favor, preencha todos os campos.");
-        return;
-      }
-      Alert.alert("Sucesso", "Login de paciente bem-sucedido!");
-    } else {
-      if (!email || !password) {
-        Alert.alert("Erro", "Por favor, preencha todos os campos.");
-        return;
-      }
-      Alert.alert("Sucesso", "Login de usuário do sistema bem-sucedido!");
+  const handleLogin = async () => {
+    if (!email || !senha) {
+      Alert.alert("Erro", "Por favor, preencha o email e a senha.");
+      return;
+    }
+    setLoading(true);
+    const payload = { email, senha };
+    try {
+      const response = await api.post("/usuarios/login", payload);
+      Alert.alert("Sucesso!", "Login de usuário realizado com sucesso.");
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      const errorMessage =
+        error.response?.data?.message ||
+        "Email ou senha incorretos. Tente novamente.";
+      Alert.alert("Erro no Login", errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Ionicons name="medical" size={32} color="#1827ff" />
         <Text style={styles.headerTitle}>Saúde Positivo</Text>
@@ -62,7 +69,6 @@ export default function Login() {
           Faça login para acessar seus exames
         </Text>
 
-        {/* Seletor de tipo de usuário */}
         <View style={styles.userTypeSelector}>
           <TouchableOpacity
             style={[
@@ -80,6 +86,7 @@ export default function Login() {
               Paciente
             </Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={[
               styles.userTypeButton,
@@ -100,72 +107,55 @@ export default function Login() {
 
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Email</Text>
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              name="mail-outline"
-              size={20}
-              color="#666"
-              style={styles.inputIcon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Digite seu email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite seu email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
         </View>
 
-        {userType === "paciente" ? (
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>CPF</Text>
-            <View style={styles.inputWrapper}>
-              <Ionicons
-                name="card-outline"
-                size={20}
-                color="#666"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Digite seu CPF"
-                value={cpf}
-                onChangeText={(text) => setCpf(formatarCPF(text))}
-                keyboardType="numeric"
-                maxLength={14}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-          </View>
-        ) : (
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Senha</Text>
-            <View style={styles.inputWrapper}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={20}
-                color="#666"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Digite sua senha"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={true}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-          </View>
-        )}
+        <View
+          style={
+            userType === "paciente" ? styles.inputContainer : styles.hidden
+          }
+        >
+          <Text style={styles.label}>CPF</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite seu CPF"
+            value={cpf}
+            onChangeText={(text) => setCpf(formatarCPF(text))}
+            keyboardType="numeric"
+            maxLength={14}
+          />
+        </View>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Entrar</Text>
+        <View
+          style={userType === "usuario" ? styles.inputContainer : styles.hidden}
+        >
+          <Text style={styles.label}>Senha</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite sua senha"
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry={true}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.loginButtonText}>Entrar</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -173,11 +163,7 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingHorizontal: 24,
-  },
+  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 24 },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -191,9 +177,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     color: "#1827ff",
   },
-  formContainer: {
-    flex: 1,
-  },
+  formContainer: { flex: 1 },
   bemvindoText: {
     fontSize: 28,
     fontWeight: "bold",
@@ -219,55 +203,32 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
   },
-  activeUserTypeButton: {
-    backgroundColor: "#1827ff",
-  },
-  userTypeButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1827ff",
-  },
-  activeUserTypeButtonText: {
-    color: "#fff",
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 8,
-    color: "#333",
-  },
-  inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f8f8f8",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  inputIcon: {
-    marginRight: 10,
-  },
+  activeUserTypeButton: { backgroundColor: "#1827ff" },
+  userTypeButtonText: { fontSize: 16, fontWeight: "600", color: "#1827ff" },
+  activeUserTypeButtonText: { color: "#fff" },
+  inputContainer: { marginBottom: 20 },
+  label: { fontSize: 16, fontWeight: "600", marginBottom: 8, color: "#333" },
   input: {
-    flex: 1,
-    paddingVertical: 15,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 15,
+    borderRadius: 10,
     fontSize: 16,
-    color: "#333",
   },
   loginButton: {
     backgroundColor: "#1827ff",
     paddingVertical: 15,
     borderRadius: 10,
     marginTop: 20,
-    marginBottom: 30,
   },
   loginButtonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
+  },
+
+  hidden: {
+    display: "none",
   },
 });
