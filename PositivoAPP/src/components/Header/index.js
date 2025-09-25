@@ -1,5 +1,7 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, StatusBar } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+
+const statusBarHeight = StatusBar.currentHeight ? StatusBar.currentHeight : 64;
 
 export default function Header({ nomeUsuario = "Usuário" }) {
   return (
@@ -20,7 +22,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-center",
     paddingHorizontal: 30,
-    paddingVertical: 30,
+    paddingVertical: 20,
+    marginTop: statusBarHeight,
     borderBottomWidth: 3,
     borderColor: '#777'
   },
