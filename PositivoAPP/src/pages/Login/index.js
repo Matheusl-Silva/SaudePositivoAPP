@@ -3,7 +3,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   TextInput,
   Alert,
 } from "react-native";
@@ -12,61 +11,46 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
 export default function Login() {
-  const [CPF, setCPF] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
+  const [userType, setUserType] = useState("paciente");
+  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [password, setPassword] = useState("");
   const navigation = useNavigation();
 
-  const handleLogin = () => {
-    if (!CPF || !dataNascimento) {
-      Alert.alert("Erro", "Por favor, preencha todos os campos");
-      return;
-    }
-
-    navigation.navigate("Home");
-  };
-
-  const formatarData = (text) => {
-    const numeros = text.replace(/\D/g, "");
-
-    if (numeros.length <= 2) {
-      return numeros;
-    } else if (numeros.length <= 4) {
-      return `${numeros.slice(0, 2)}/${numeros.slice(2)}`;
-    } else {
-      return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(
-        4,
-        8
-      )}`;
-    }
-  };
-
   const formatarCPF = (text) => {
-  const numeros = text.replace(/\D/g, "");
-
-  if (numeros.length <= 3) {
-    return numeros;
-  } else if (numeros.length <= 6) {
-    return `${numeros.slice(0, 3)}.${numeros.slice(3)}`;
-  } else if (numeros.length <= 9) {
-    return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6)}`;
-  } else {
+    const numeros = text.replace(/\D/g, "");
+    if (numeros.length <= 3) return numeros;
+    if (numeros.length <= 6)
+      return `${numeros.slice(0, 3)}.${numeros.slice(3)}`;
+    if (numeros.length <= 9)
+      return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(
+        6
+      )}`;
     return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(
       6,
       9
     )}-${numeros.slice(9, 11)}`;
-  }
-};
+  };
 
-
-  const handleDataChange = (text) => {
-    const formatted = formatarData(text);
-    if (formatted.length <= 10) {
-      setDataNascimento(formatted);
+  const handleLogin = () => {
+    if (userType === "paciente") {
+      if (!email || !cpf) {
+        Alert.alert("Erro", "Por favor, preencha todos os campos.");
+        return;
+      }
+      Alert.alert("Sucesso", "Login de paciente bem-sucedido!");
+    } else {
+      if (!email || !password) {
+        Alert.alert("Erro", "Por favor, preencha todos os campos.");
+        return;
+      }
+      Alert.alert("Sucesso", "Login de usuário do sistema bem-sucedido!");
     }
   };
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <Ionicons name="medical" size={32} color="#1827ff" />
         <Text style={styles.headerTitle}>Saúde Positivo</Text>
@@ -78,8 +62,44 @@ export default function Login() {
           Faça login para acessar seus exames
         </Text>
 
+        {/* Seletor de tipo de usuário */}
+        <View style={styles.userTypeSelector}>
+          <TouchableOpacity
+            style={[
+              styles.userTypeButton,
+              userType === "paciente" && styles.activeUserTypeButton,
+            ]}
+            onPress={() => setUserType("paciente")}
+          >
+            <Text
+              style={[
+                styles.userTypeButtonText,
+                userType === "paciente" && styles.activeUserTypeButtonText,
+              ]}
+            >
+              Paciente
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.userTypeButton,
+              userType === "usuario" && styles.activeUserTypeButton,
+            ]}
+            onPress={() => setUserType("usuario")}
+          >
+            <Text
+              style={[
+                styles.userTypeButtonText,
+                userType === "usuario" && styles.activeUserTypeButtonText,
+              ]}
+            >
+              Usuário
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>CPF</Text>
+          <Text style={styles.label}>Email</Text>
           <View style={styles.inputWrapper}>
             <Ionicons
               name="mail-outline"
@@ -89,36 +109,60 @@ export default function Login() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Digite seu CPF"
-              value={CPF}
-              onChangeText={(text) => setCPF(formatarCPF(text))}
-              keyboardType="numeric"
-              maxLength={14}
+              placeholder="Digite seu email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
             />
           </View>
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Data de Nascimento</Text>
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              name="calendar-outline"
-              size={20}
-              color="#666"
-              style={styles.inputIcon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="dd/mm/aaaa"
-              value={dataNascimento}
-              onChangeText={handleDataChange}
-              keyboardType="numeric"
-              maxLength={10}
-            />
+        {userType === "paciente" ? (
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>CPF</Text>
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="card-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Digite seu CPF"
+                value={cpf}
+                onChangeText={(text) => setCpf(formatarCPF(text))}
+                keyboardType="numeric"
+                maxLength={14}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
           </View>
-        </View>
+        ) : (
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Senha</Text>
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Digite sua senha"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={true}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
+          </View>
+        )}
 
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Entrar</Text>
@@ -132,24 +176,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 16,
+    paddingHorizontal: 24,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 40,
+    marginTop: 80,
     marginBottom: 40,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: "bold",
     marginLeft: 12,
-    color: "#1827ffff",
+    color: "#1827ff",
   },
   formContainer: {
     flex: 1,
-    paddingHorizontal: 20,
   },
   bemvindoText: {
     fontSize: 28,
@@ -163,6 +206,29 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 40,
     color: "#666",
+  },
+  userTypeSelector: {
+    flexDirection: "row",
+    marginBottom: 20,
+    backgroundColor: "#f8f8f8",
+    borderRadius: 10,
+  },
+  userTypeButton: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  activeUserTypeButton: {
+    backgroundColor: "#1827ff",
+  },
+  userTypeButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1827ff",
+  },
+  activeUserTypeButtonText: {
+    color: "#fff",
   },
   inputContainer: {
     marginBottom: 20,
@@ -192,7 +258,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   loginButton: {
-    backgroundColor: "#1827ffff",
+    backgroundColor: "#1827ff",
     paddingVertical: 15,
     borderRadius: 10,
     marginTop: 20,
@@ -203,17 +269,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
-  },
-  footer: {
-    alignItems: "center",
-  },
-  footerText: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "center",
-  },
-  linkText: {
-    color: "#1827ffff",
-    fontWeight: "600",
   },
 });
