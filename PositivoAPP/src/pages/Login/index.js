@@ -44,7 +44,7 @@ export default function Login() {
     const payload = { email, senha };
     try {
       const response = await api.post("/usuarios/login", payload);
-      Alert.alert("Sucesso!", "Login de usuário realizado com sucesso.");
+      navigation.navigate("Home");
     } catch (error) {
       console.error(error.response?.data || error.message);
       const errorMessage =

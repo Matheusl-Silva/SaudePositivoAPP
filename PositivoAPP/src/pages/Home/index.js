@@ -1,15 +1,15 @@
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Listagem from "../../components/ListagemDeExames"
 
-export default function Home({ nome = "Default" }) {
+export default function Home() {
 
   const navigation = useNavigation();
 
@@ -21,7 +21,7 @@ export default function Home({ nome = "Default" }) {
       </View>
 
       <View style={styles.welcomeContainer}>
-        <Text style={styles.welcomeText}>Olá, {nome}</Text>
+        <Text style={styles.welcomeText}>Olá, {usuario?.nome ?? "Usuário"}</Text>
         <Text style={styles.subtitleText}>
           Consulte seus resultados de exames.
         </Text>
