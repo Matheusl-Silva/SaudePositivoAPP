@@ -24,44 +24,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estrutura da tabela `exame_bioquimica`
---
-
-CREATE TABLE `exame_bioquimica` (
-  `id` int(11) NOT NULL,
-  `nbilirrubina_total` decimal(10,2) DEFAULT NULL,
-  `nbilirrubina_direta` decimal(10,2) DEFAULT NULL,
-  `nproteina_total` decimal(10,2) DEFAULT NULL,
-  `nalbumina` decimal(10,2) DEFAULT NULL,
-  `namilase` decimal(10,2) DEFAULT NULL,
-  `ntgo_transaminase_glutamico_oxalacetica` decimal(10,2) DEFAULT NULL,
-  `ntgp_transaminase_glutamico_piruvica` decimal(10,2) DEFAULT NULL,
-  `ngama_gt_glutamiltransferase` decimal(10,2) DEFAULT NULL,
-  `nfosfatase_alcalina` decimal(10,2) DEFAULT NULL,
-  `nreatina_quinase_ck` decimal(10,2) DEFAULT NULL,
-  `nglicose` decimal(10,2) DEFAULT NULL,
-  `nferro` decimal(10,2) DEFAULT NULL,
-  `ncolesterol_total` decimal(10,2) DEFAULT NULL,
-  `nhdl` decimal(10,2) DEFAULT NULL,
-  `nldl` decimal(10,2) DEFAULT NULL,
-  `ntriglicerideos` decimal(10,2) DEFAULT NULL,
-  `nureia` decimal(10,2) DEFAULT NULL,
-  `ncreatinina` decimal(10,2) DEFAULT NULL,
-  `nacido_urico` decimal(10,2) DEFAULT NULL,
-  `npcr_proteina_c_reativa` decimal(10,2) DEFAULT NULL,
-  `ncalcio` decimal(10,2) DEFAULT NULL,
-  `nldh` decimal(10,2) DEFAULT NULL,
-  `nmagnesio` decimal(10,2) DEFAULT NULL,
-  `nfosforo` decimal(10,2) DEFAULT NULL,
-  `id_responsavel` int(11) NOT NULL,
-  `id_preceptor` int(11) NOT NULL,
-  `id_paciente` int(11) NOT NULL,
-  `ddata_exame` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Estrutura da tabela `exame_hematologia`
 --
 
@@ -164,17 +126,6 @@ INSERT INTO `usuario` (`id`, `cnome`, `cemail`, `csenha`, `cadmin`) VALUES
 (11, 'Matheus Silva', 'matleandrosilva@gmail.com', 'matheus123', 'S');
 
 --
--- Índices para tabelas despejadas
---
-
---
--- Índices para tabela `exame_bioquimica`
---
-ALTER TABLE `exame_bioquimica`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_responsavel` (`id_responsavel`),
-  ADD KEY `id_preceptor` (`id_preceptor`),
-  ADD KEY `id_paciente` (`id_paciente`);
 
 --
 -- Índices para tabela `exame_hematologia`
@@ -202,11 +153,6 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de tabelas despejadas
 --
 
---
--- AUTO_INCREMENT de tabela `exame_bioquimica`
---
-ALTER TABLE `exame_bioquimica`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `exame_hematologia`
@@ -230,15 +176,6 @@ ALTER TABLE `usuario`
 -- Restrições para despejos de tabelas
 --
 
---
--- Limitadores para a tabela `exame_bioquimica`
---
-ALTER TABLE `exame_bioquimica`
-  ADD CONSTRAINT `exame_bioquimica_ibfk_1` FOREIGN KEY (`id_responsavel`) REFERENCES `usuario` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `exame_bioquimica_ibfk_2` FOREIGN KEY (`id_preceptor`) REFERENCES `usuario` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `exame_bioquimica_ibfk_3` FOREIGN KEY (`id_paciente`) REFERENCES `paciente` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
 -- Limitadores para a tabela `exame_hematologia`
 --
 ALTER TABLE `exame_hematologia`
