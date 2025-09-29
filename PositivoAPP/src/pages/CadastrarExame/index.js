@@ -4,8 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  ScrollView,
-  Alert,
+  ScrollView
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -48,11 +47,6 @@ export default function EditarExame() {
     setForm({ ...form, [name]: value });
   };
 
-  const handleSave = () => {
-    Alert.alert("Salvar", "Exame atualizado com sucesso!");
-    console.log("Exame salvo:", form);
-  };
-
   const renderRow = (inputs) => (
     <View style={styles.row}>
       {inputs.map(
@@ -79,7 +73,7 @@ export default function EditarExame() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Ionicons name="document-text" size={32} color="#1827ff" />
-        <Text style={styles.headerTitle}>Editar Exame</Text>
+        <Text style={styles.headerTitle}>Cadastrar Exame</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.formContainer}>
@@ -155,9 +149,9 @@ export default function EditarExame() {
           ["Data do Exame", "dataExame"],
         ])}
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Ionicons name="save" size={20} color="#fff" />
-          <Text style={styles.saveButtonText}>Salvar</Text>
+        <TouchableOpacity style={styles.editButton}>
+          <Ionicons name="pencil-sharp" size={20} color="#fff" />
+          <Text style={styles.editButtonText}>Editar</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -218,17 +212,17 @@ const styles = StyleSheet.create({
     color: "#333",
     backgroundColor: "#f8f8f8",
   },
-  saveButton: {
+  editButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#10b981",
+    backgroundColor: "#1827ff",
     paddingVertical: 15,
     borderRadius: 10,
     marginTop: 30,
     gap: 8,
   },
-  saveButtonText: {
+  editButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
