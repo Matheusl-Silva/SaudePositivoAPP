@@ -45,19 +45,38 @@ export default function EditarExame() {
 
   const [buttonColor, setButtonColor] = useState("#1827ff");
   const [title, setTitle] = useState("Cadastrar Exame");
-  const [buttonIcon, setButtonIcon] = useState("save");
+  const [editButtonIcon, setEditButtonIcon] = useState("pencil-sharp");
   const [buttonText, setButtonText] = useState("Editar");
+  const [deleteButtonIcon, setDeleteButtonIcon] = useState('trash');
+  const [deleteButtonText, setDeleteButtonText] = useState('Excluir');
+
+  const [deleteButtonFunction, setDeleteButtonFunction] = useState(() => () => {}); //Colocar a função de excluir exame aqui depois
 
   const handleChange = (name, value) => {
     setForm({ ...form, [name]: value });
   };
 
-  const handlePress = () => {
+  const handlePressEdit = () => {
     setButtonColor("#10b981");
     setTitle("Editar Exame");
-    setButtonIcon("pencil-sharp");
+    setEditButtonIcon("save");
     setButtonText("Salvar");
+    setDeleteButtonIcon("close");
+    setDeleteButtonText("Cancelar");
+    
+    setDeleteButtonFunction(() => handlePressCancel);
   };
+
+  const handlePressCancel = () => {
+    setButtonColor("#1827ff");
+    setTitle("Cadastrar Exame");
+    setEditButtonIcon("pencil-sharp");
+    setButtonText("Editar");
+    setDeleteButtonIcon("trash");
+    setDeleteButtonText("Excluir");
+
+    setDeleteButtonFunction(() => () => {}); //Colocar a função de excluir exame aqui depois
+  }
 
   const renderRow = (inputs) => (
     <View style={styles.row}>
@@ -161,12 +180,13 @@ export default function EditarExame() {
           ["Data do Exame", "dataExame"],
         ])}
 
-        <TouchableOpacity
-          style={[styles.editButton, { backgroundColor: buttonColor }]}
-          onPress={handlePress}
-        >
-          <Ionicons name={buttonIcon} size={20} color="#fff" />
-          <Text style={styles.editButtonText}>{buttonText}</Text>
+        <TouchableOpacity style={[styles.button, { backgroundColor: buttonColor }]} onPress={handlePressEdit}>
+          <Ionicons name={editButtonIcon} size={20} color="#fff" />
+          <Text style={styles.buttonText}>{buttonText}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, {backgroundColor: "#cc2121", marginTop: 5}]} onPress={deleteButtonFunction}>
+          <Ionicons name={deleteButtonIcon} size={20} color="#fff" />
+          <Text style={styles.buttonText}>{deleteButtonText}</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -227,17 +247,16 @@ const styles = StyleSheet.create({
     color: "#333",
     backgroundColor: "#f8f8f8",
   },
-  editButton: {
+  button: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#1827ff",
     paddingVertical: 15,
     borderRadius: 10,
     marginTop: 30,
     gap: 8,
   },
-  editButtonText: {
+  buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
