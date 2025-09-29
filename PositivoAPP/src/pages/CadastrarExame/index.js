@@ -4,7 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -43,8 +43,20 @@ export default function EditarExame() {
     dataExame: "",
   });
 
+  const [buttonColor, setButtonColor] = useState("#1827ff");
+  const [title, setTitle] = useState("Cadastrar Exame");
+  const [buttonIcon, setButtonIcon] = useState("save");
+  const [buttonText, setButtonText] = useState("Editar");
+
   const handleChange = (name, value) => {
     setForm({ ...form, [name]: value });
+  };
+
+  const handlePress = () => {
+    setButtonColor("#10b981");
+    setTitle("Editar Exame");
+    setButtonIcon("pencil-sharp");
+    setButtonText("Salvar");
   };
 
   const renderRow = (inputs) => (
@@ -73,7 +85,7 @@ export default function EditarExame() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Ionicons name="document-text" size={32} color="#1827ff" />
-        <Text style={styles.headerTitle}>Cadastrar Exame</Text>
+        <Text style={styles.headerTitle}>{title}</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.formContainer}>
@@ -149,9 +161,12 @@ export default function EditarExame() {
           ["Data do Exame", "dataExame"],
         ])}
 
-        <TouchableOpacity style={styles.editButton}>
-          <Ionicons name="pencil-sharp" size={20} color="#fff" />
-          <Text style={styles.editButtonText}>Editar</Text>
+        <TouchableOpacity
+          style={[styles.editButton, { backgroundColor: buttonColor }]}
+          onPress={handlePress}
+        >
+          <Ionicons name={buttonIcon} size={20} color="#fff" />
+          <Text style={styles.editButtonText}>{buttonText}</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
