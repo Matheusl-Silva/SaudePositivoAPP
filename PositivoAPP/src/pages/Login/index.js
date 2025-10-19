@@ -9,16 +9,14 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import api from "../../services/api";
 
-export default function Login() {
+export default function Login({ onLogin }) {
   const [userType, setUserType] = useState("paciente");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigation = useNavigation();
 
   const formatarCPF = (text) => {
     const numeros = text.replace(/\D/g, "");
@@ -44,7 +42,7 @@ export default function Login() {
     const payload = { email, senha };
     try {
       const response = await api.post("/usuarios/login", payload);
-      navigation.navigate("Home");
+      onLogin(); // Chama a função onLogin em vez de navegar
     } catch (error) {
       console.error(error.response?.data || error.message);
       const errorMessage =
