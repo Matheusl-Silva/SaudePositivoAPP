@@ -44,7 +44,7 @@ export default function EditarExame() {
   });
 
   const [buttonColor, setButtonColor] = useState("#1827ff");
-  const [title, setTitle] = useState("Cadastrar Exame");
+  const [title, setTitle] = useState("Visualizar Exame");
   const [editButtonIcon, setEditButtonIcon] = useState("pencil-sharp");
   const [buttonText, setButtonText] = useState("Editar");
   const [deleteButtonIcon, setDeleteButtonIcon] = useState('trash');
@@ -69,7 +69,7 @@ export default function EditarExame() {
 
   const handlePressCancel = () => {
     setButtonColor("#1827ff");
-    setTitle("Cadastrar Exame");
+    setTitle("Visualizar Exame");
     setEditButtonIcon("pencil-sharp");
     setButtonText("Editar");
     setDeleteButtonIcon("trash");
