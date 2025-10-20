@@ -7,9 +7,10 @@ import {
   ScrollView,
 } from "react-native";
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
-const exames = [
+const examesMock = [
   {
     id: 1,
     idPaciente: "123",
@@ -30,6 +31,7 @@ export default function BuscarExames() {
   const [idPaciente, setIdPaciente] = useState("");
   const [exames, setExames] = useState([]);
   const [error, setError] = useState("");
+  const navigation = useNavigation();
 
   const handleSearch = () => {
     if (!idPaciente) {
@@ -38,7 +40,8 @@ export default function BuscarExames() {
       return;
     }
 
-    const resultados = exames.filter(
+    // filtrar sobre o mock (ou fonte de dados) e popular o estado de exames
+    const resultados = examesMock.filter(
       (exame) => exame.idPaciente === idPaciente
     );
 
@@ -52,8 +55,8 @@ export default function BuscarExames() {
   };
 
   const handleView = (exame) => {
-    // Aqui você pode navegar para a tela de detalhes do exame
-    console.log("Visualizar exame", exame);
+    // Navega para a tela de visualização passando o exame como param
+    navigation.navigate("VisualizarExame", { exame });
   };
 
   const handleDelete = (exameId) => {
@@ -64,6 +67,12 @@ export default function BuscarExames() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={24} color="#1827ff" />
+        </TouchableOpacity>
         <Ionicons name="search" size={32} color="#1827ff" />
         <Text style={styles.headerTitle}>Buscar Exames</Text>
       </View>
@@ -84,7 +93,9 @@ export default function BuscarExames() {
           <Ionicons name="search" size={20} color="#fff" />
           <Text style={styles.buttonText}>Buscar</Text>
         </TouchableOpacity>
-        {error ? <Text style={{ color: "#cc2121", marginTop: 10 }}>{error}</Text> : null}
+        {error ? (
+          <Text style={{ color: "#cc2121", marginTop: 10 }}>{error}</Text>
+        ) : null}
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
@@ -129,6 +140,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
+  },
+  backButton: {
+    position: "absolute",
+    left: 0,
+    padding: 8,
   },
   headerTitle: {
     fontSize: 24,

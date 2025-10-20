@@ -5,12 +5,13 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Alert,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-export default function VisualizarExame({ route }) {
+export default function InserirExame() {
   const navigation = useNavigation();
   const [form, setForm] = useState({
     hemacia: "",
@@ -45,56 +46,22 @@ export default function VisualizarExame({ route }) {
     dataExame: "",
   });
 
-  // Se a tela receber um exame via params, popular o formulário
-  useEffect(() => {
-    if (route && route.params && route.params.exame) {
-      const exame = route.params.exame;
-      // preenche apenas os campos disponíveis no mock
-      setForm((f) => ({
-        ...f,
-        idPaciente: exame.idPaciente ?? f.idPaciente,
-        dataExame: exame.dataExame ?? f.dataExame,
-        idResponsavel: exame.idResponsavel ?? f.idResponsavel,
-        idPreceptor: exame.idPreceptor ?? f.idPreceptor,
-      }));
-    }
-  }, [route]);
-
-  const [buttonColor, setButtonColor] = useState("#1827ff");
-  const [title, setTitle] = useState("Visualizar Exame");
-  const [editButtonIcon, setEditButtonIcon] = useState("pencil-sharp");
-  const [buttonText, setButtonText] = useState("Editar");
-  const [deleteButtonIcon, setDeleteButtonIcon] = useState("trash");
-  const [deleteButtonText, setDeleteButtonText] = useState("Excluir");
-
-  const [deleteButtonFunction, setDeleteButtonFunction] = useState(
-    () => () => {}
-  ); //Colocar a função de excluir exame aqui depois
-
   const handleChange = (name, value) => {
     setForm({ ...form, [name]: value });
   };
 
-  const handlePressEdit = () => {
-    setButtonColor("#10b981");
-    setTitle("Editar Exame");
-    setEditButtonIcon("save");
-    setButtonText("Salvar");
-    setDeleteButtonIcon("close");
-    setDeleteButtonText("Cancelar");
+  const handleSave = () => {
+    if (!form.idPaciente || !form.dataExame) {
+      Alert.alert("Erro", "ID do Paciente e Data do Exame são obrigatórios.");
+      return;
+    }
 
-    setDeleteButtonFunction(() => handlePressCancel);
-  };
-
-  const handlePressCancel = () => {
-    setButtonColor("#1827ff");
-    setTitle("Visualizar Exame");
-    setEditButtonIcon("pencil-sharp");
-    setButtonText("Editar");
-    setDeleteButtonIcon("trash");
-    setDeleteButtonText("Excluir");
-
-    setDeleteButtonFunction(() => () => {}); //Colocar a função de excluir exame aqui depois
+    Alert.alert("Sucesso", "Exame cadastrado com sucesso!", [
+      {
+        text: "OK",
+        onPress: () => navigation.goBack(),
+      },
+    ]);
   };
 
   const renderRow = (inputs) => (
@@ -126,10 +93,10 @@ export default function VisualizarExame({ route }) {
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Ionicons name="arrow-back" size={24} color="#1827ff" />
+          <Ionicons name="arrow-back" size={24} color="#10b981" />
         </TouchableOpacity>
-        <Ionicons name="document-text" size={32} color="#1827ff" />
-        <Text style={styles.headerTitle}>{title}</Text>
+        <Ionicons name="add-circle" size={32} color="#10b981" />
+        <Text style={styles.headerTitle}>Inserir Exame</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.formContainer}>
@@ -201,23 +168,16 @@ export default function VisualizarExame({ route }) {
           ["ID Preceptor", "idPreceptor"],
         ])}
         {renderRow([
-          ["ID Paciente", "idPaciente"],
-          ["Data do Exame", "dataExame"],
+          ["ID Paciente *", "idPaciente"],
+          ["Data do Exame *", "dataExame"],
         ])}
 
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: buttonColor }]}
-          onPress={handlePressEdit}
+          style={[styles.button, { backgroundColor: "#10b981" }]}
+          onPress={handleSave}
         >
-          <Ionicons name={editButtonIcon} size={20} color="#fff" />
-          <Text style={styles.buttonText}>{buttonText}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#cc2121", marginTop: 5 }]}
-          onPress={deleteButtonFunction}
-        >
-          <Ionicons name={deleteButtonIcon} size={20} color="#fff" />
-          <Text style={styles.buttonText}>{deleteButtonText}</Text>
+          <Ionicons name="save" size={20} color="#fff" />
+          <Text style={styles.buttonText}>Salvar Exame</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -246,7 +206,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginLeft: 12,
-    color: "#1827ff",
+    color: "#10b981",
   },
   formContainer: {
     paddingBottom: 100,
@@ -256,7 +216,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 20,
     marginBottom: 10,
-    color: "#1827ff",
+    color: "#10b981",
   },
   row: {
     flexDirection: "row",

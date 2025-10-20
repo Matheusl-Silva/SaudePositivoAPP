@@ -5,12 +5,15 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 
 import Home from "../pages/Home";
+import Exames from "../pages/Exames";
 import ListarPaciente from "../pages/Listar/ListarPaciente";
 import ListarUsuario from "../pages/Listar/ListarUsuario";
 import CadastroPaciente from "../pages/Cadastro/CadastroPaciente";
 import CadastroUsuario from "../pages/Cadastro/CadastroUsuario";
 import AtualizacaoUsuario from "../pages/Atualizacao/AtualizacaoUsuario";
-import ExameHematologico from "../pages/Exames/Hematologico";
+import BuscarExames from "../pages/BuscarExames";
+import InserirExame from "../pages/InserirExame";
+import VisualizarExame from "../pages/VisualizarExame";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -37,19 +40,26 @@ function UsuariosStack() {
 
 function ExamesStack() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="ExamesHome">
       <Stack.Screen
-        name="ListaExames"
-        component={Home}
+        name="ExamesHome"
+        component={Exames}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Exame Hematológico"
-        component={ExameHematologico}
-        options={{
-          headerShown: false,
-          presentation: "modal",
-        }}
+        name="BuscarExames"
+        component={BuscarExames}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="InserirExame"
+        component={InserirExame}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="VisualizarExame"
+        component={VisualizarExame}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
@@ -77,7 +87,7 @@ export default function MainNavigator() {
               iconName = focused ? "add-circle" : "add-circle-outline";
             }
 
-            return <Ionicons name={iconName} size={size} color={color} />;
+            return <Ionicons name={iconName} size={25} color={color} />;
           },
           tabBarActiveTintColor: "#1827ff",
           tabBarInactiveTintColor: "gray",
@@ -87,7 +97,8 @@ export default function MainNavigator() {
             borderTopColor: "#e0e0e0",
             paddingBottom: 5,
             paddingTop: 5,
-            height: 60,
+            height: 65,
+            marginBottom: 15,
           },
           headerStyle: {
             backgroundColor: "#ffff",
