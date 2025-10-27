@@ -9,7 +9,8 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
+
+import DropDownPicker from "react-native-dropdown-picker";
 
 export default function CreatePaciente({ navigation }) {
   const [nome, setNome] = useState("");
@@ -20,6 +21,14 @@ export default function CreatePaciente({ navigation }) {
   const [dataNascimento, setDataNascimento] = useState("");
   const [telefone, setTelefone] = useState("");
   const [cpf, setCpf] = useState("");
+
+  const [open, setOpen] = useState(false);
+
+  const items = [
+    { label: "Manhã", value: "Manhã" },
+    { label: "Tarde", value: "Tarde" },
+    { label: "Noite", value: "Noite" },
+  ];
 
   const handleCadastro = () => {
     if (!nome || !email || !periodo || !dataNascimento || !telefone || !cpf) {
@@ -35,52 +44,56 @@ export default function CreatePaciente({ navigation }) {
     ]);
   };
 
-    function formatarData(text) {
-        const digits = text.replace(/\D/g, "").slice(0, 8);
+  function formatarData(text) {
+    const digits = text.replace(/\D/g, "").slice(0, 8);
 
-        let formatted = digits;
+    let formatted = digits;
 
-        if (digits.length > 2 && digits.length <= 4) {
-            formatted = digits.slice(0, 2) + "/" + digits.slice(2);
-        } else if (digits.length > 4) {
-            formatted =
-            digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4);
-        }
-
-        return formatted;
+    if (digits.length > 2 && digits.length <= 4) {
+      formatted = digits.slice(0, 2) + "/" + digits.slice(2);
+    } else if (digits.length > 4) {
+      formatted =
+        digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4);
     }
 
-    function formatarTelefone(text) {
-        const digits = text.replace(/\D/g, "").slice(0, 11);
+    return formatted;
+  }
 
-        if (digits.length <= 2) {
-            return `(${digits}`;
-        } else if (digits.length <= 7) {
-            return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-        } else if (digits.length <= 11) {
-            return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-        }
+  function formatarTelefone(text) {
+    const digits = text.replace(/\D/g, "").slice(0, 11);
 
-        return digits;
+    if (digits.length <= 2) {
+      return `(${digits}`;
+    } else if (digits.length <= 7) {
+      return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    } else if (digits.length <= 11) {
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
     }
 
-    const formatarCPF = (text) => {
-        const numeros = text.replace(/\D/g, "");
-        if (numeros.length <= 3) return numeros;
-        if (numeros.length <= 6)
-        return `${numeros.slice(0, 3)}.${numeros.slice(3)}`;
-        if (numeros.length <= 9)
-        return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(
-            6
-        )}`;
-        return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(
-        6,
-        9
-        )}-${numeros.slice(9, 11)}`;
-    };
+    return digits;
+  }
+
+  const formatarCPF = (text) => {
+    const numeros = text.replace(/\D/g, "");
+    if (numeros.length <= 3) return numeros;
+    if (numeros.length <= 6)
+      return `${numeros.slice(0, 3)}.${numeros.slice(3)}`;
+    if (numeros.length <= 9)
+      return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(
+        6
+      )}`;
+    return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(
+      6,
+      9
+    )}-${numeros.slice(9, 11)}`;
+  };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 100 }}
+    >
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
@@ -117,22 +130,33 @@ export default function CreatePaciente({ navigation }) {
           keyboardType="email-address"
         />
 
-        <View style={styles.inputContainer}>
-        <Text style={styles.label}>
+        <View style={[styles.inputContainer, { zIndex: 1000 }]}>
+          <Text style={styles.label}>
             Período <Text style={styles.required}>*</Text>
-        </Text>
-        <View style={styles.pickerWrapper}>
-            <Picker
-            selectedValue={periodo}
-            onValueChange={(itemValue) => setPeriodo(itemValue)}
-            style={styles.picker}
-            >
-            <Picker.Item label="Selecione um período" value="" />
-            <Picker.Item label="Manhã" value="Manhã" />
-            <Picker.Item label="Tarde" value="Tarde" />
-            <Picker.Item label="Noite" value="Noite" />
-            </Picker>
-        </View>
+          </Text>
+
+          <DropDownPicker
+            open={open}
+            value={periodo}
+            items={items}
+            setOpen={setOpen}
+            setValue={setPeriodo}
+            listMode="SCROLLVIEW"
+            placeholder="Selecione um período"
+            style={styles.dropdownStyle}
+            containerStyle={styles.dropdownContainer}
+            textStyle={{ fontSize: 16, color: periodo ? "#333" : "#a1a1a1" }}
+            showTickIcon={true}
+            TickIconComponent={({ style }) => (
+              <Ionicons
+                name="checkmark-circle"
+                size={20}
+                color="#1827ff"
+                style={style}
+              />
+            )}
+            autoScroll={true}
+          />
         </View>
 
         <InputField
@@ -220,6 +244,7 @@ function InputField({
         <TextInput
           style={styles.input}
           placeholder={placeholder}
+          placeholderTextColor="#a1a1a1"
           value={value}
           onChangeText={onChangeText}
           keyboardType={keyboardType}
@@ -230,22 +255,64 @@ function InputField({
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: "#fff" 
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+
+  dropdownContainer: {
+    height: 50,
+    zIndex: 1000,
+  },
+
+  dropdownStyle: {
+    backgroundColor: "#f8f8f8",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    minHeight: 50,
+  },
+
+  pickerWrapper: {},
+  picker: {},
+
+  inputContainer: {
+    marginBottom: 20,
+  },
+
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 8,
+    color: "#333",
+  },
+
+  required: {
+    color: "red",
+  },
+
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8f8f8",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 20,
     paddingBottom: 20,
   },
 
-  backButton: { 
-    padding: 8, 
-    marginRight: 16 
+  backButton: {
+    padding: 8,
+    marginRight: 16,
   },
 
   headerContent: {
@@ -263,10 +330,10 @@ const styles = StyleSheet.create({
     color: "#1827ff",
   },
 
-  formContainer: { 
-    flex: 1, 
-    paddingHorizontal: 24, 
-    paddingBottom: 40 
+  formContainer: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingBottom: 40,
   },
 
   title: {
@@ -284,40 +351,15 @@ const styles = StyleSheet.create({
     color: "#666",
   },
 
-  inputContainer: { 
-    marginBottom: 20 
+  inputIcon: {
+    marginRight: 10,
   },
 
-  label: {
+  input: {
+    flex: 1,
+    paddingVertical: 15,
     fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 8,
     color: "#333",
-  },
-
-  required: { 
-    color: "red" 
-  },
-
-  inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f8f8f8",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-
-  inputIcon: { 
-    marginRight: 10 
-  },
-
-  input: { 
-    flex: 1, 
-    paddingVertical: 15, 
-    fontSize: 16, 
-    color: "#333" 
   },
 
   cadastroButton: {
@@ -348,16 +390,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     textAlign: "center",
-  },
-
-  pickerWrapper: {
-    backgroundColor: "#f8f8f8",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-
-  picker: {
-    color: "#333",
   },
 });

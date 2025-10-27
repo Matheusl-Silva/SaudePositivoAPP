@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-
+import { useNavigation } from "@react-navigation/native";
 
 const mockUsers = [
   { id: 1, nome: "Matheus Silva", email: "matheus@email.com", admin: "S" },
@@ -18,6 +18,7 @@ const mockUsers = [
 export default function UsersList() {
   const [users, setUsers] = useState(mockUsers);
   const [searchText, setSearchText] = useState("");
+  const navigation = useNavigation();
 
   const filteredUsers = users.filter(
     (user) =>
@@ -26,7 +27,7 @@ export default function UsersList() {
   );
 
   const handleEditUser = (user) => {
-    Alert.alert("Editar", `Editar usuário: ${user.nome}`);
+    navigation.navigate("Atualizar Usuário", { user });
   };
 
   const handleDeleteUser = (user) => {
@@ -90,7 +91,6 @@ export default function UsersList() {
 
   return (
     <View style={styles.container}>
-      
       <View style={styles.header}>
         <Ionicons name="people" size={32} color="#1827ff" />
         <Text style={styles.headerTitle}>Lista de Usuários</Text>
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 80,
+    marginTop: 20,
     marginBottom: 20,
   },
   headerTitle: {

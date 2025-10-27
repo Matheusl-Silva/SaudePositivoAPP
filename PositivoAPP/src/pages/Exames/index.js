@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -8,50 +8,55 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import Listagem from "../../components/ListagemDeExames";
 
-export default function Home() {
-  const [usuario, setUsuario] = useState(null);
+export default function Exames() {
   const navigation = useNavigation();
-
-  useEffect(() => {
-    setUsuario({ nome: "Usuário" });
-  }, []);
 
   return (
     <View style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.header}>
-          <Ionicons name="medical" size={32} color="#1827ff" />
-          <Text style={styles.headerTitle}>Saúde Positivo</Text>
+          <Ionicons name="flask" size={32} color="#1827ff" />
+          <Text style={styles.headerTitle}>Exames Laboratoriais</Text>
         </View>
 
         <View style={styles.welcomeContainer}>
-          <Text style={styles.welcomeText}>
-            Olá, {usuario?.nome ?? "Usuário"}
-          </Text>
+          <Text style={styles.welcomeText}>Gerenciar Exames</Text>
           <Text style={styles.subtitleText}>
-            Realize novos cadastros de exames.
+            Busque exames existentes ou cadastre novos exames hematológicos.
           </Text>
         </View>
 
         <View style={styles.cardsContainer}>
           <TouchableOpacity
-            style={styles.card}
-            onPress={() => navigation.navigate("Exames")}
+            style={[styles.card, styles.searchCard]}
+            onPress={() => {
+              navigation.navigate("BuscarExames");
+            }}
           >
-            <Ionicons name="flask" size={40} color="#1827ff" />
-            <Text style={styles.cardTitle}>Exames Laboratoriais</Text>
+            <Ionicons name="search" size={40} color="#1827ff" />
+            <Text style={styles.cardTitle}>Buscar Exames</Text>
             <Text style={styles.cardSubtitle}>
-              Acessar funcionalidades de exames
+              Pesquisar e visualizar exames existentes
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.card, styles.insertCard]}
+            onPress={() => {
+              navigation.navigate("InserirExame");
+            }}
+          >
+            <Ionicons name="add-circle" size={40} color="#10b981" />
+            <Text style={styles.cardTitle}>Inserir Exame</Text>
+            <Text style={styles.cardSubtitle}>
+              Cadastrar novo exame hematológico
             </Text>
           </TouchableOpacity>
         </View>
-
-        <Listagem />
       </ScrollView>
     </View>
   );
@@ -64,18 +69,21 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    padding: 16,
+  },
+  scrollContent: {
+    paddingBottom: 100,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 20,
-    marginBottom: 30,
+    marginTop: 60,
+    marginBottom: 20,
     backgroundColor: "#fff",
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 15,
+    marginHorizontal: 16,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -95,6 +103,7 @@ const styles = StyleSheet.create({
     paddingVertical: 25,
     paddingHorizontal: 20,
     borderRadius: 15,
+    marginHorizontal: 16,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -114,7 +123,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   cardsContainer: {
-    marginBottom: 30,
+    paddingHorizontal: 16,
   },
   card: {
     backgroundColor: "#fff",
@@ -128,7 +137,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
     borderLeftWidth: 4,
+  },
+  searchCard: {
     borderLeftColor: "#1827ff",
+  },
+  insertCard: {
+    borderLeftColor: "#10b981",
   },
   cardTitle: {
     fontSize: 18,
@@ -142,5 +156,12 @@ const styles = StyleSheet.create({
     marginTop: 6,
     color: "#666",
     lineHeight: 20,
+  },
+  debugText: {
+    fontSize: 14,
+    color: "#ff6b6b",
+    marginTop: 10,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });

@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 export default function EditUser() {
   const [nomeCompleto, setNomeCompleto] = useState("");
@@ -19,6 +20,17 @@ export default function EditUser() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { user } = route.params || {};
+
+  useEffect(() => {
+    if (user) {
+      setNomeCompleto(user.nome || "");
+      setEmail(user.email || "");
+      setIsAdmin(user.admin === "S");
+    }
+  }, [user]);
 
   const validarDados = () => {
     if (!nomeCompleto.trim()) {
@@ -51,11 +63,22 @@ export default function EditUser() {
     return true;
   };
 
+  const handleSave = () => {
+    if (validarDados()) {
+      // Aqui você pode implementar a lógica para salvar no backend
+      Alert.alert("Sucesso", "Usuário atualizado com sucesso!", [
+        {
+          text: "OK",
+          onPress: () => navigation.goBack(),
+        },
+      ]);
+    }
+  };
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
@@ -124,10 +147,9 @@ export default function EditUser() {
                 {isAdmin ? "Administrador" : "Usuário Comum"}
               </Text>
               <Text style={styles.switchDescription}>
-                {isAdmin 
-                  ? "Acesso completo ao sistema" 
-                  : "Acesso limitado às funcionalidades básicas"
-                }
+                {isAdmin
+                  ? "Acesso completo ao sistema"
+                  : "Acesso limitado às funcionalidades básicas"}
               </Text>
             </View>
             <Switch
@@ -197,13 +219,18 @@ export default function EditUser() {
             </TouchableOpacity>
           </View>
         </View>
-        {/* Botao de cancelar ainda nao funciona pois nao implementamos os drawers ou navigation*/}
-        <TouchableOpacity 
-          style={styles.cancelButton} 
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.cancelButtonText}>Cancelar</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.saveButtonText}>Salvar Alterações</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.cancelButtonText}>Cancelar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -330,6 +357,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingHorizontal: 16,
     position: "relative",
+  },
+  buttonContainer: {
+    gap: 12,
+    marginTop: 20,
+  },
+  saveButton: {
+    backgroundColor: "#1827ff",
+    paddingVertical: 15,
+    borderRadius: 10,
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
   },
   cancelButton: {
     backgroundColor: "transparent",
