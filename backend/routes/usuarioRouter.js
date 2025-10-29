@@ -1,13 +1,16 @@
+// routes/usuarioRouter.js
 const express = require("express");
 const router = express.Router();
 const usuarioController = require("../Controller/usuarioController");
+const verifyJWT = require("../middlewares/authMiddlewares");
 
-router.get("/", usuarioController.getAllUsuarios);
-router.get("/:idUsuario", usuarioController.getUsuariobyId);
+router.post("/login", usuarioController.login);
 router.post("/", usuarioController.createUsuario);
 router.post("/verificar-email", usuarioController.verificarEmail);
-router.post("/login", usuarioController.login);
-router.put("/:idUsuario", usuarioController.updateUsuario);
-router.delete("/:idUsuario", usuarioController.deleteUsuario);
+
+router.get("/", verifyJWT, usuarioController.getAllUsuarios);
+router.get("/:idUsuario", verifyJWT, usuarioController.getUsuariobyId);
+router.put("/:idUsuario", verifyJWT, usuarioController.updateUsuario);
+router.delete("/:idUsuario", verifyJWT, usuarioController.deleteUsuario);
 
 module.exports = router;
