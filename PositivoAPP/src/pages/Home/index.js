@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import Listagem from "../../components/ListagemDeExames";
 
 export default function Home() {
   const [usuario, setUsuario] = useState(null);
@@ -51,7 +50,6 @@ export default function Home() {
           </TouchableOpacity>
         </View>
 
-        <Listagem />
       </ScrollView>
     </View>
   );

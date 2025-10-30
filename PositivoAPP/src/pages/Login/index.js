@@ -92,6 +92,7 @@ export default function Login({ onLogin }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 24 },
   header: {
+    paddingTop: 30,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -109,6 +110,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
+    marginTop: 30,
     marginBottom: 8,
     color: "#333",
   },

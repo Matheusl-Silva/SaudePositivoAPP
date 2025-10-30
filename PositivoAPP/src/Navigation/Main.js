@@ -1,4 +1,5 @@
 import React from "react";
+import { Platform } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -29,6 +30,26 @@ function UsuariosStack() {
       <Stack.Screen
         name="Atualizar Usuário"
         component={AtualizacaoUsuario}
+        options={{
+          headerShown: false,
+          presentation: "modal",
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function PacienteStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Lista Pacientes"j
+        component={ListarPaciente}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Atualizar Paciente"
+        component={CadastroPaciente}
         options={{
           headerShown: false,
           presentation: "modal",
@@ -98,7 +119,7 @@ export default function MainNavigator() {
             paddingBottom: 5,
             paddingTop: 5,
             height: 65,
-            marginBottom: 15,
+            marginBottom: Platform.OS === "android" ? 50 : 15,
           },
           headerStyle: {
             backgroundColor: "#ffff",
@@ -127,7 +148,7 @@ export default function MainNavigator() {
         />
         <Tab.Screen
           name="Pacientes"
-          component={ListarPaciente}
+          component={PacienteStack}
           options={{
             title: "Pacientes",
             headerTitle: "Lista de Pacientes",
