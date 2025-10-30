@@ -43,6 +43,10 @@ exports.verificarEmail = async (req, res) => {
 exports.login = async (req, res) => {
   const { email, senha } = req.body;
 
+  if (!email || !senha) {
+    return res.status(400).json({ error: "Email e senha são obrigatórios." });
+  }
+
   try {
     const usuarioResult = await usuarioDao.findByEmail(email);
 
@@ -51,8 +55,15 @@ exports.login = async (req, res) => {
     }
 
     const usuario = usuarioResult[0];
+    const senhaDoBanco = usuario.csenha;
 
-    const senhaValida = await bcrypt.compare(senha, usuario.csenha);
+    let senhaValida = false;
+
+    if (senhaDoBanco.startsWith("$2a$") || senhaDoBanco.startsWith("$2b$")) {
+      senhaValida = await bcrypt.compare(senha, senhaDoBanco);
+    } else {
+      senhaValida = senha === senhaDoBanco;
+    }
 
     if (!senhaValida) {
       return res.status(401).json({ error: "Email ou senha inválidos." });

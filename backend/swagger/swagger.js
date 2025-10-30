@@ -6,7 +6,7 @@ const options = {
     info: {
       title: "API ProjetoDesenv",
       version: "1.0.0",
-      description: "Documentação da API com Swagger",
+      description: "Documentação da API do ProjetoDesenv(Hematologia)",
     },
     servers: [
       {
