@@ -25,7 +25,7 @@ export default function Login({ onLogin }) {
     const payload = { email, senha };
     try {
       const response = await api.post("/usuarios/login", payload);
-      onLogin(); // Chama a função onLogin em vez de navegar
+      onLogin();
     } catch (error) {
       console.error(error.response?.data || error.message);
       const errorMessage =
