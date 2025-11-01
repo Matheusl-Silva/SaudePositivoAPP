@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import api from "../../services/api";
+import { loginUsuario } from "../../services/userService";
 
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState("");
@@ -22,9 +22,8 @@ export default function Login({ onLogin }) {
       return;
     }
     setLoading(true);
-    const payload = { email, senha };
     try {
-      const response = await api.post("/usuarios/login", payload);
+      const data = await loginUsuario(email, senha);
       onLogin();
     } catch (error) {
       console.error(error.response?.data || error.message);
