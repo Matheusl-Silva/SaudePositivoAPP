@@ -11,6 +11,7 @@ import {
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { atualizarUsuario } from "../../services/userService";
 
 export default function EditUser() {
   const [nomeCompleto, setNomeCompleto] = useState("");
@@ -19,6 +20,7 @@ export default function EditUser() {
   const [senhaConfirma, setSenhaConfirma] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigation = useNavigation();
   const route = useRoute();
@@ -49,11 +51,23 @@ export default function EditUser() {
       return false;
     }
 
-    if (senha || senhaConfirma) {
+    const senhaPreenchida = senha.trim() !== "";
+    const senhaConfirmaPreenchida = senhaConfirma.trim() !== "";
+
+    if (senhaPreenchida || senhaConfirmaPreenchida) {
+      if (!senhaPreenchida || !senhaConfirmaPreenchida) {
+        Alert.alert(
+          "Erro",
+          "Para alterar a senha, preencha ambos os campos (senha e confirmação)."
+        );
+        return false;
+      }
+
       if (senha.length < 8) {
         Alert.alert("Erro", "A senha deve ter pelo menos 8 caracteres.");
         return false;
       }
+
       if (senha !== senhaConfirma) {
         Alert.alert("Erro", "As senhas não coincidem.");
         return false;
@@ -63,9 +77,34 @@ export default function EditUser() {
     return true;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (validarDados()) {
-      // Aqui você pode implementar a lógica para salvar no backend
+      setLoading(true);
+      try {
+        const senhaParaEnviar =
+          senha.trim() !== "" && senhaConfirma.trim() !== "" ? senha : null;
+        const result = await atualizarUsuario(
+          user.id,
+          nomeCompleto,
+          email,
+          senhaParaEnviar,
+          isAdmin
+        );
+        if (result.error) {
+          Alert.alert("Erro", result.error);
+          return;
+        }
+      } catch (error) {
+        console.error(error.response?.data || error.message);
+        Alert.alert(
+          "Erro",
+          error.response?.data?.message ||
+            "Ocorreu um erro ao tentar atualizar o usuário."
+        );
+        return;
+      } finally {
+        setLoading(false);
+      }
       Alert.alert("Sucesso", "Usuário atualizado com sucesso!", [
         {
           text: "OK",
@@ -220,8 +259,14 @@ export default function EditUser() {
           </View>
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Salvar Alterações</Text>
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={handleSave}
+            disabled={loading}
+          >
+            <Text style={styles.saveButtonText}>
+              {loading ? "Salvando..." : "Salvar Alterações"}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity

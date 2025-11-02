@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { cadastrarUsuario } from "./../../services/userService";
 
 export default function CreateUser() {
   const [nomeCompleto, setNomeCompleto] = useState("");
@@ -18,6 +19,7 @@ export default function CreateUser() {
   const [senhaConfirma, setSenhaConfirma] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
 
   const validarSenha = () => {
     if (senha.length < 8) {
@@ -31,7 +33,7 @@ export default function CreateUser() {
     return true;
   };
 
-  const handleCadastro = () => {
+  const handleCadastro = async () => {
     if (!nomeCompleto || !email || !senha || !senhaConfirma) {
       Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
       return;
@@ -39,6 +41,17 @@ export default function CreateUser() {
 
     if (!validarSenha()) {
       return;
+    }
+    setLoading(true);
+
+    try {
+      const novoUsuario = await cadastrarUsuario(nomeCompleto, email, senha);
+    } catch (error) {
+      Alert.alert("Erro", "Ocorreu um erro ao tentar cadastrar o usuário.");
+      console.error(error);
+      return;
+    } finally {
+      setLoading(false);
     }
 
     Alert.alert("Sucesso", "Usuário cadastrado com sucesso!", [
@@ -172,8 +185,11 @@ export default function CreateUser() {
         <TouchableOpacity
           style={styles.cadastroButton}
           onPress={handleCadastro}
+          disabled={loading}
         >
-          <Text style={styles.cadastroButtonText}>Cadastrar Usuário</Text>
+          <Text style={styles.cadastroButtonText}>
+            {loading ? "Cadastrando..." : "Cadastrar Usuário"}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity

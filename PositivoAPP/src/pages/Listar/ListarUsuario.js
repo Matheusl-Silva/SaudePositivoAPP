@@ -7,38 +7,74 @@ import {
   TextInput,
   Alert,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-
-const mockUsers = [
-  { id: 1, nome: "Matheus Silva", email: "matheus@email.com", admin: "S" },
-];
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import {
+  buscarTodosUsuarios,
+  deletarUsuario,
+} from "../../services/userService";
 
 export default function UsersList() {
-  const [users, setUsers] = useState(mockUsers);
+  const [users, setUsers] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.nome.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchText.toLowerCase())
+  const carregarUsuarios = async () => {
+    try {
+      const data = await buscarTodosUsuarios();
+      setUsers(data);
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      Alert.alert(
+        "Erro",
+        "Não foi possível carregar os usuários. Tente novamente."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    carregarUsuarios();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarUsuarios();
+    }, [])
   );
+
+  const filteredUsers = users.filter((user) => {
+    const nome = user?.nome?.toLowerCase() || "";
+    const email = user?.email?.toLowerCase() || "";
+    const search = searchText.toLowerCase();
+    return nome.includes(search) || email.includes(search);
+  });
 
   const handleEditUser = (user) => {
     navigation.navigate("Atualizar Usuário", { user });
   };
 
-  const handleDeleteUser = (user) => {
+  const handleDeleteUser = async (user) => {
     Alert.alert("Confirmar", `Excluir usuário ${user.nome}?`, [
       { text: "Cancelar", style: "cancel" },
       {
         text: "Excluir",
         style: "destructive",
-        onPress: () => {
-          setUsers(users.filter((u) => u.id !== user.id));
-          Alert.alert("Sucesso", "Usuário excluído!");
+        onPress: async () => {
+          try {
+            const result = await deletarUsuario(user.id);
+            if (result.error) {
+              Alert.alert("Erro", result.error);
+              return;
+            }
+            setUsers(users.filter((u) => u.id !== user.id));
+            Alert.alert("Sucesso", "Usuário excluído!");
+          } catch (error) {
+            Alert.alert("Erro", "Não foi possível excluir o usuário.");
+          }
         },
       },
     ]);
@@ -89,6 +125,15 @@ export default function UsersList() {
     </View>
   );
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#1827ff" />
+        <Text style={{ marginTop: 10, color: "#666" }}>Carregando...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -128,7 +173,10 @@ export default function UsersList() {
         showsVerticalScrollIndicator={false}
       />
 
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => navigation.getParent().navigate("Cadastrar Usuário")}
+      >
         <Ionicons name="person-add" size={20} color="#fff" />
         <Text style={styles.addButtonText}>Novo Usuário</Text>
       </TouchableOpacity>
