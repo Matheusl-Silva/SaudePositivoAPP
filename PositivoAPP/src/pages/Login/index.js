@@ -24,7 +24,12 @@ export default function Login({ onLogin }) {
     setLoading(true);
     try {
       const data = await loginUsuario(email, senha);
-      onLogin();
+      onLogin({
+        id: data.usuario.id,
+        nome: data.usuario.nome,
+        email: data.usuario.email,
+        admin: data.usuario.admin,
+      });
     } catch (error) {
       console.error(error.response?.data || error.message);
       const errorMessage =

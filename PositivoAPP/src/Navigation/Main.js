@@ -87,7 +87,7 @@ function ExamesStack() {
   );
 }
 
-export default function MainNavigator() {
+export default function MainNavigator({ onLogout, usuarioLogado }) {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -132,7 +132,9 @@ export default function MainNavigator() {
     >
       <Tab.Screen
         name="Home"
-        component={Home}
+        children={(props) => (
+          <Home {...props} onLogout={onLogout} usuarioLogado={usuarioLogado} />
+        )}
         options={{
           title: "Início",
           headerTitle: "Saúde Positivo",

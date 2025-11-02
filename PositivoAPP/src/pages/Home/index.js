@@ -9,10 +9,9 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-export default function Home() {
+export default function Home({ onLogout, usuarioLogado }) {
   const [usuario, setUsuario] = useState(null);
   const navigation = useNavigation();
-
   useEffect(() => {
     setUsuario({ nome: "Usuário" });
   }, []);
@@ -30,7 +29,7 @@ export default function Home() {
 
         <View style={styles.welcomeContainer}>
           <Text style={styles.welcomeText}>
-            Olá, {usuario?.nome ?? "Usuário"}
+            Olá, {usuarioLogado?.nome ?? "Usuário"}
           </Text>
           <Text style={styles.subtitleText}>
             Realize novos cadastros de exames.
@@ -48,8 +47,13 @@ export default function Home() {
               Acessar funcionalidades de exames
             </Text>
           </TouchableOpacity>
-        </View>
 
+          <TouchableOpacity style={styles.logoutCard} onPress={onLogout}>
+            <Ionicons name="log-out-outline" size={40} color="#ff1744" />
+            <Text style={styles.logoutTitle}>Sair do Sistema</Text>
+            <Text style={styles.cardSubtitle}>Encerrar sessão atual</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -140,5 +144,25 @@ const styles = StyleSheet.create({
     marginTop: 6,
     color: "#666",
     lineHeight: 20,
+  },
+  logoutCard: {
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 15,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+    borderLeftWidth: 4,
+    borderLeftColor: "#ff1744",
+  },
+  logoutTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 12,
+    color: "#ff1744",
   },
 });
