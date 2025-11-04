@@ -39,6 +39,12 @@ export default function CreateUser() {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert("Erro", "Por favor, insira um email válido.");
+      return false;
+    }
+
     if (!validarSenha()) {
       return;
     }
