@@ -11,7 +11,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { loginUsuario } from "../../services/userService";
 
-export default function Login({ onLogin }) {
+export default function Login({ onLogin, navigation }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,8 +44,16 @@ export default function Login({ onLogin }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Ionicons name="medical" size={32} color="#1827ff" />
-        <Text style={styles.headerTitle}>Saúde Positivo</Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#1827ff" />
+        </TouchableOpacity>
+        <View style={styles.headerContent}>
+          <Ionicons name="medical" size={32} color="#1827ff" />
+          <Text style={styles.headerTitle}>Saúde Positivo</Text>
+        </View>
       </View>
 
       <View style={styles.formContainer}>
@@ -88,6 +96,15 @@ export default function Login({ onLogin }) {
             <Text style={styles.loginButtonText}>Entrar</Text>
           )}
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.registerLink}
+          onPress={() => navigation.navigate("Register")}
+        >
+          <Text style={styles.registerLinkText}>
+            Não tem uma conta? <Text style={styles.registerLinkBold}>Cadastre-se</Text>
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -96,12 +113,17 @@ export default function Login({ onLogin }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 24 },
   header: {
-    paddingTop: 30,
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    marginBottom: 40,
+  },
+  backButton: {
+    marginBottom: 10,
+  },
+  headerContent: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 80,
-    marginBottom: 40,
   },
   headerTitle: {
     fontSize: 24,
@@ -144,5 +166,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  registerLink: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  registerLinkText: {
+    fontSize: 16,
+    color: "#666",
+  },
+  registerLinkBold: {
+    color: "#1827ff",
+    fontWeight: "bold",
   },
 });
