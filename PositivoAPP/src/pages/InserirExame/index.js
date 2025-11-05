@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { cadastrarExame } from "../../services/examService";
 
 export default function InserirExame() {
   const navigation = useNavigation();
@@ -39,21 +40,34 @@ export default function InserirExame() {
     celulasLinfoides: "",
     celulasMonocitoides: "",
     plaquetas: "",
-    volumePlaquetarioMedio: "",
-    idResponsavel: "",
-    idPreceptor: "",
-    idPaciente: "",
-    dataExame: "",
+    volumeplaquetariomedio: "",
+    id_responsavel: "",
+    id_preceptor: "",
+    id_paciente: "",
+    data: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (name, value) => {
     setForm({ ...form, [name]: value });
   };
 
-  const handleSave = () => {
-    if (!form.idPaciente || !form.dataExame) {
-      Alert.alert("Erro", "ID do Paciente e Data do Exame são obrigatórios.");
+  const handleSave = async () => {
+    if (!form.id_paciente || !form.data) {
+      Alert.alert("Erro", "ID do paciente e Data do Exame são obrigatórios.");
       return;
+    }
+
+    setLoading(true);
+    console.log(form);
+    try {
+      await cadastrarExame(form);
+    } catch (error) {
+      Alert.alert("Erro", "Ocorreu um erro ao tentar cadastrar o exame.");
+      console.error(error);
+      return;
+    } finally {
+      setLoading(false);
     }
 
     Alert.alert("Sucesso", "Exame cadastrado com sucesso!", [
@@ -159,17 +173,17 @@ export default function InserirExame() {
         <Text style={styles.sectionTitle}>Plaquetas</Text>
         {renderRow([
           ["Plaquetas", "plaquetas"],
-          ["Vol. Plaquetário Médio", "volumePlaquetarioMedio"],
+          ["Vol. Plaquetário Médio", "volumeplaquetariomedio"],
         ])}
 
         <Text style={styles.sectionTitle}>Identificação</Text>
         {renderRow([
-          ["ID Responsável", "idResponsavel"],
-          ["ID Preceptor", "idPreceptor"],
+          ["ID Responsável", "id_responsavel"],
+          ["ID Preceptor", "id_preceptor"],
         ])}
         {renderRow([
-          ["ID Paciente *", "idPaciente"],
-          ["Data do Exame *", "dataExame"],
+          ["ID Paciente *", "id_paciente"],
+          ["Data do Exame *", "data"],
         ])}
 
         <TouchableOpacity
