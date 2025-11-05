@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-
+import { cadastrarPaciente } from "../../services/pacienteService";
 import DropDownPicker from "react-native-dropdown-picker";
 
 export default function CreatePaciente({ navigation }) {
@@ -21,7 +21,7 @@ export default function CreatePaciente({ navigation }) {
   const [dataNascimento, setDataNascimento] = useState("");
   const [telefone, setTelefone] = useState("");
   const [cpf, setCpf] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
   const items = [
@@ -30,18 +30,51 @@ export default function CreatePaciente({ navigation }) {
     { label: "Noite", value: "Noite" },
   ];
 
-  const handleCadastro = () => {
+  const limparCampos = () => {
+    setNome("");
+    setEmail("");
+    setPeriodo("");
+    setMedicamento("");
+    setPatologia("");
+    setDataNascimento("");
+    setTelefone("");
+    setCpf("");
+    setOpen(false);
+  };
+
+  const handleCadastro = async () => {
     if (!nome || !email || !periodo || !dataNascimento || !telefone || !cpf) {
       Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
       return;
     }
+    setLoading(true);
 
-    Alert.alert("Sucesso", "Paciente cadastrado com sucesso!", [
-      {
-        text: "OK",
-        onPress: () => navigation.goBack(),
-      },
-    ]);
+    try {
+      const novoPaciente = await cadastrarPaciente(
+        nome,
+        email,
+        periodo,
+        medicamento,
+        patologia,
+        dataNascimento,
+        telefone,
+        cpf
+      );
+
+      limparCampos();
+
+      Alert.alert("Sucesso", "Paciente cadastrado com sucesso!", [
+        {
+          text: "OK",
+          onPress: () => navigation.goBack(),
+        },
+      ]);
+    } catch (error) {
+      Alert.alert("Erro", "Ocorreu um erro ao tentar cadastrar o paciente.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   function formatarData(text) {
@@ -92,7 +125,7 @@ export default function CreatePaciente({ navigation }) {
     <ScrollView
       style={styles.container}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 100 }}
+      contentContainerStyle={{ paddingBottom: 50 }}
     >
       <View style={styles.header}>
         <TouchableOpacity
@@ -208,8 +241,11 @@ export default function CreatePaciente({ navigation }) {
         <TouchableOpacity
           style={styles.cadastroButton}
           onPress={handleCadastro}
+          disabled={loading}
         >
-          <Text style={styles.cadastroButtonText}>Cadastrar Paciente</Text>
+          <Text style={styles.cadastroButtonText}>
+            {loading ? "Cadastrando..." : "Cadastrar Paciente"}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -274,9 +310,6 @@ const styles = StyleSheet.create({
     minHeight: 50,
   },
 
-  pickerWrapper: {},
-  picker: {},
-
   inputContainer: {
     marginBottom: 20,
   },
@@ -333,7 +366,6 @@ const styles = StyleSheet.create({
   formContainer: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingBottom: 40,
   },
 
   title: {

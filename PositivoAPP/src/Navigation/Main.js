@@ -16,6 +16,7 @@ import AtualizacaoUsuario from "../pages/Atualizacao/AtualizacaoUsuario";
 import BuscarExames from "../pages/BuscarExames";
 import InserirExame from "../pages/InserirExame";
 import VisualizarExame from "../pages/VisualizarExame";
+import EditPaciente from "../pages/Atualizacao/AtualizacaoPaciente";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -50,7 +51,7 @@ function PacienteStack() {
       />
       <Stack.Screen
         name="Atualizar Paciente"
-        component={CadastroPaciente}
+        component={EditPaciente}
         options={{
           headerShown: false,
           presentation: "modal",

@@ -6,61 +6,74 @@ import {
   FlatList,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
-
-const mockPacientes = [
-  {
-    id: 1,
-    cnome: "Ana Souza",
-    cemail: "ana@email.com",
-    cperiodo: "Manhã",
-    cmedicamento: "Dipirona",
-    cpatologia: "Enxaqueca",
-    ddata_nascimento: "1995-06-12",
-    ddata_cadastro: "2025-09-01",
-    ctelefone: "(11) 91234-5678",
-    ccpf: "123.456.789-00",
-  },
-  {
-    id: 2,
-    cnome: "Carlos Pereira",
-    cemail: "carlos@email.com",
-    cperiodo: "Tarde",
-    cmedicamento: "Losartana",
-    cpatologia: "Hipertensão",
-    ddata_nascimento: "1980-03-22",
-    ddata_cadastro: "2025-09-10",
-    ctelefone: "(21) 99876-5432",
-    ccpf: "987.654.321-00",
-  },
-];
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import {
+  buscarTodosPacientes,
+  deletarPaciente,
+} from "../../services/pacienteService";
 
 export default function PacienteList() {
-  const [pacientes, setPacientes] = useState(mockPacientes);
+  const [pacientes, setPacientes] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
-  const filteredPacientes = pacientes.filter(
-    (paciente) =>
-      paciente.cnome.toLowerCase().includes(searchText.toLowerCase()) ||
-      paciente.cemail.toLowerCase().includes(searchText.toLowerCase()) ||
-      paciente.ccpf.includes(searchText)
-  );
-
-  const handleEditPaciente = (paciente) => {
-    Alert.alert("Editar", `Editar paciente: ${paciente.cnome}`);
+  const carregarPacientes = async () => {
+    try {
+      setLoading(true);
+      const data = await buscarTodosPacientes();
+      setPacientes(data);
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      Alert.alert(
+        "Erro",
+        "Não foi possível carregar os pacientes. Tente novamente."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeletePaciente = (paciente) => {
+  useEffect(() => {
+    carregarPacientes();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarPacientes();
+    }, [])
+  );
+
+  const filteredPacientes = pacientes.filter((paciente) => {
+    const nome = paciente?.cnome?.toLowerCase() || "";
+    const email = paciente?.cemail?.toLowerCase() || "";
+    const cpf = paciente?.ccpf || "";
+    const search = searchText.toLowerCase();
+    return nome.includes(search) || email.includes(search) || cpf.includes(searchText);
+  });
+
+  const handleEditPaciente = (paciente) => {
+    navigation.navigate("Atualizar Paciente", { paciente });
+  };
+
+  const handleDeletePaciente = async (paciente) => {
     Alert.alert("Confirmar", `Excluir paciente ${paciente.cnome}?`, [
       { text: "Cancelar", style: "cancel" },
       {
         text: "Excluir",
         style: "destructive",
-        onPress: () => {
-          setPacientes(pacientes.filter((p) => p.id !== paciente.id));
-          Alert.alert("Sucesso", "Paciente excluído!");
+        onPress: async () => {
+          try {
+            const result = await deletarPaciente(paciente.id);
+            setPacientes(pacientes.filter((p) => p.id !== paciente.id));
+            Alert.alert("Sucesso", "Paciente excluído!");
+          } catch (error) {
+            Alert.alert("Erro", "Não foi possível excluir o paciente.");
+          }
         },
       },
     ]);
@@ -75,10 +88,10 @@ export default function PacienteList() {
         <Text style={styles.text}>🆔 CPF: {item.ccpf}</Text>
         <Text style={styles.text}>🕑 Período: {item.cperiodo}</Text>
         {item.cmedicamento ? (
-          <Text style={styles.text}>💊 {item.cmedicamento}</Text>
+          <Text style={styles.text}>💊Medicamento: {item.cmedicamento}</Text>
         ) : null}
         {item.cpatologia ? (
-          <Text style={styles.text}>⚕️ {item.cpatologia}</Text>
+          <Text style={styles.text}>⚕️Patologia: {item.cpatologia}</Text>
         ) : null}
       </View>
       <View style={styles.actions}>
@@ -107,6 +120,15 @@ export default function PacienteList() {
       </Text>
     </View>
   );
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#1827ff" />
+        <Text style={{ marginTop: 10, color: "#666" }}>Carregando...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -140,14 +162,17 @@ export default function PacienteList() {
 
       <FlatList
         data={filteredPacientes}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
         renderItem={renderPacienteItem}
         ListEmptyComponent={renderEmptyList}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />
 
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => navigation.getParent().navigate("Cadastrar Paciente")}
+      >
         <Ionicons name="person-add" size={20} color="#fff" />
         <Text style={styles.addButtonText}>Novo Paciente</Text>
       </TouchableOpacity>
@@ -156,7 +181,17 @@ export default function PacienteList() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 24 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingHorizontal: 24,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -170,9 +205,17 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     color: "#1827ff",
   },
-  counterContainer: { marginBottom: 20 },
-  counterText: { fontSize: 16, color: "#333" },
-  counterNumber: { fontWeight: "bold", color: "#1827ff" },
+  counterContainer: {
+    marginBottom: 20,
+  },
+  counterText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  counterNumber: {
+    fontWeight: "bold",
+    color: "#1827ff",
+  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -183,9 +226,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e0e0e0",
   },
-  searchIcon: { marginRight: 10 },
-  searchInput: { flex: 1, paddingVertical: 15, fontSize: 16, color: "#333" },
-  listContainer: { paddingBottom: 100 },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 15,
+    fontSize: 16,
+    color: "#333",
+  },
+  listContainer: {
+    paddingBottom: 100,
+  },
   card: {
     flexDirection: "row",
     alignItems: "center",
@@ -196,10 +248,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e0e0e0",
   },
-  info: { flex: 1 },
-  nome: { fontSize: 18, fontWeight: "bold", color: "#333", marginBottom: 4 },
-  text: { fontSize: 14, color: "#555", marginBottom: 4 },
-  actions: { flexDirection: "row", gap: 8 },
+  info: {
+    flex: 1,
+  },
+  nome: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 4,
+  },
+  text: {
+    fontSize: 14,
+    color: "#555",
+    marginBottom: 4,
+  },
+  actions: {
+    flexDirection: "row",
+    gap: 8,
+  },
   editButton: {
     backgroundColor: "#1827ff",
     padding: 10,
@@ -210,7 +276,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
   },
-  emptyState: { alignItems: "center", paddingVertical: 60 },
+  emptyState: {
+    alignItems: "center",
+    paddingVertical: 60,
+  },
   emptyTitle: {
     fontSize: 20,
     fontWeight: "bold",
@@ -218,7 +287,11 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
   },
-  emptySubtitle: { fontSize: 16, color: "#666", textAlign: "center" },
+  emptySubtitle: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+  },
   addButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -232,5 +305,9 @@ const styles = StyleSheet.create({
     right: 24,
     gap: 8,
   },
-  addButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
