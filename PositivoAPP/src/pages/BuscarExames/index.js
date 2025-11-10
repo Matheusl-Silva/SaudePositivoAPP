@@ -42,8 +42,8 @@ export default function BuscarExames() {
   };
 
   useEffect(() => {
-    carregarExames()
-  }, [])
+    if (idPaciente) carregarExames();
+  }, []);
 
   const handleSearch = async () => {
     if (!idPaciente) {
@@ -56,7 +56,6 @@ export default function BuscarExames() {
   };
 
   const handleView = (exame) => {
-    // Navega para a tela de visualização passando o exame como param
     navigation.navigate("VisualizarExame", { exame });
   };
 
