@@ -7,7 +7,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { buscarTodosExamesPaciente,  deletarExame} from "../../services/examService";
@@ -40,6 +40,10 @@ export default function BuscarExames() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    carregarExames()
+  }, [])
 
   const handleSearch = async () => {
     if (!idPaciente) {
