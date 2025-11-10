@@ -169,4 +169,27 @@ router.get("/listar/:idExame", hematoController.getById);
  */
 router.post("/", hematoController.CreateHemato);
 
+/**
+ * @swagger
+ * /exameHemato/{idExame}:
+ *   delete:
+ *     summary: Exclui um exame hematológico
+ *     tags: [Hematologia]
+ *     parameters:
+ *       - name: idExame
+ *         in: path
+ *         required: true
+ *         description: ID do exame a ser excluído
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Exame excluído com sucesso
+ *       404:
+ *         description: Exame não encontrado
+ *       500:
+ *         description: Erro ao excluir exame
+ */
+router.delete("/:idExame", hematoController.deleteHemato);
+
 module.exports = router;

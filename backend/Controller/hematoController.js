@@ -49,3 +49,20 @@ exports.CreateHemato = async (req, res) => {
     res.status(500).json({ error: "Erro interno ao criar exame do paciente" });
   }
 };
+
+exports.deleteHemato = async (req, res) => {
+  const id = req.params.idExame;
+  const dadosDeletar = req.body;
+
+  try {
+    const result = await hematoDao.delete(id, dadosDeletar);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Exame não encontrado" });
+    }
+
+    res.status(200).json({ message: "Exame deletado com sucesso" });
+  } catch (err) {
+    console.error("Erro ao tentar deletar o exame: ", err);
+    res.status(500).json({ error: "Erro ao tentar deletar exame" });
+  }
+};

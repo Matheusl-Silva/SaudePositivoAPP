@@ -84,7 +84,13 @@ export async function deletarExame(idExame) {
 
 export async function buscarTodosExamesPaciente(idPaciente) {
   const response = await api.get(`/exameHemato/${idPaciente}`);
-  return response.data;
+  const examesFormatados = response.data.map((e) => ({
+    id: e.id,
+    data: e.ddata_exame,
+    idPreceptor: e.id_preceptor,
+    idResponsavel: e.id_responsavel
+  }))
+  return examesFormatados;
 }
 
 export async function buscarExame(idExame){

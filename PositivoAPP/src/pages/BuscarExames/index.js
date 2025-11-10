@@ -5,53 +5,50 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-
-const examesMock = [
-  {
-    id: 1,
-    idPaciente: "123",
-    dataExame: "2025-09-01",
-    idResponsavel: "Dr. João",
-    idPreceptor: "Dra. Maria",
-  },
-  {
-    id: 2,
-    idPaciente: "123",
-    dataExame: "2025-08-15",
-    idResponsavel: "Dr. Pedro",
-    idPreceptor: "Dra. Ana",
-  },
-];
+import { buscarTodosExamesPaciente,  deletarExame} from "../../services/examService";
 
 export default function BuscarExames() {
   const [idPaciente, setIdPaciente] = useState("");
   const [exames, setExames] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
-  const handleSearch = () => {
+  const carregarExames = async () => {
+    setLoading(true);
+    try {
+      const data = await buscarTodosExamesPaciente(idPaciente);
+      if (data.length === 0) {
+        setError("Nenhum exame encontrado para este paciente.");
+        return;
+      } else {
+        setError("");
+      }
+      return data;
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      Alert.alert(
+        "Erro",
+        "Erro ao listar exames do paciente. Tente novamente."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
     if (!idPaciente) {
       setError("Digite um ID de paciente válido.");
       setExames([]);
       return;
     }
 
-    // filtrar sobre o mock (ou fonte de dados) e popular o estado de exames
-    const resultados = examesMock.filter(
-      (exame) => exame.idPaciente === idPaciente
-    );
-
-    if (resultados.length === 0) {
-      setError("Nenhum exame encontrado para este paciente.");
-    } else {
-      setError("");
-    }
-
-    setExames(resultados);
+    setExames(await carregarExames());
   };
 
   const handleView = (exame) => {
@@ -59,9 +56,30 @@ export default function BuscarExames() {
     navigation.navigate("VisualizarExame", { exame });
   };
 
-  const handleDelete = (exameId) => {
-    // Aqui você pode chamar sua função de excluir exame
-    console.log("Excluir exame ID", exameId);
+  const handleDelete = async (exame) => {
+    Alert.alert("Confirmar", `Excluir exame de número ${exame.id}?`, [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Excluir",
+        style: "destructive",
+        onPress: async () => {
+          console.log("Exame: ", exame);
+          try {
+            console.log("Exame id: ", exame.id);
+            const result = await deletarExame(exame.id);
+            console.log("result:", result);
+            if (result.error) {
+              Alert.alert("Erro", result.error);
+              return;
+            }
+            setExames(exames.filter((e) => e.id !== exame.id));
+            Alert.alert("Sucesso", "Exame excluído!");
+          } catch (error) {
+            Alert.alert("Erro", "Não foi possível excluir o exame.");
+          }
+        },
+      },
+    ]);
   };
 
   return (
@@ -101,7 +119,7 @@ export default function BuscarExames() {
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         {exames.map((exame) => (
           <View key={exame.id} style={styles.exameCard}>
-            <Text style={styles.exameTitle}>Data: {exame.dataExame}</Text>
+            <Text style={styles.exameTitle}>Data: {exame.data}</Text>
             <Text>Responsável: {exame.idResponsavel}</Text>
             <Text>Preceptor: {exame.idPreceptor}</Text>
 
@@ -115,7 +133,7 @@ export default function BuscarExames() {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.smallButton, { backgroundColor: "#cc2121" }]}
-                onPress={() => handleDelete(exame.id)}
+                onPress={() => handleDelete(exame)}
               >
                 <Ionicons name="trash" size={16} color="#fff" />
                 <Text style={styles.smallButtonText}>Excluir</Text>
@@ -133,7 +151,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 20,
   },
   header: {
     flexDirection: "row",
