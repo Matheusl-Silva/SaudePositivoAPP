@@ -56,6 +56,7 @@ export default function BuscarExames() {
   };
 
   const handleView = (exame) => {
+    console.log("Exame na view de lista: ", exame);
     navigation.navigate("VisualizarExame", { exame });
   };
 
@@ -66,7 +67,6 @@ export default function BuscarExames() {
         text: "Excluir",
         style: "destructive",
         onPress: async () => {
-          console.log("Exame: ", exame);
           try {
             console.log("Exame id: ", exame.id);
             const result = await deletarExame(exame.id);

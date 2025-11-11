@@ -42,18 +42,43 @@ export default function VisualizarExame({ route }) {
     idResponsavel: "",
     idPreceptor: "",
     idPaciente: "",
-    dataExame: "",
+    data: "",
   });
 
-  // Se a tela receber um exame via params, popular o formulário
   useEffect(() => {
     if (route && route.params && route.params.exame) {
       const exame = route.params.exame;
-      // preenche apenas os campos disponíveis no mock
+      console.log("Exame na view de ecição", exame);''
       setForm((f) => ({
         ...f,
+        hemacia: exame.hemacia ?? f.hemacia,
+        hemoglobina: exame.hemoglobina ?? f.hemoglobina,  
+        hematocrito: exame.hematocrito ?? f.hematocrito,
+        vcm: exame.vcm ?? f.vcm,
+        hcm: exame.hcm ?? f.hcm,
+        chcm: exame.chcm ?? f.chcm,
+        rdw: exame.rdw ?? f.rdw,
+        leucocitos: exame.leucocitos ?? f.leucocitos,
+        neutrofilos: exame.neutrofilos ?? f.neutrofilos,
+        blastos: exame.blastos ?? f.blastos,
+        promielocitos: exame.promielocitos ?? f.promielocitos,
+        mielocitos: exame.mielocitos ?? f.mielocitos,
+        metamielocitos: exame.metamielocitos ?? f.metamielocitos,
+        bastonetes: exame.bastonetes ?? f.bastonetes,
+        segmentados: exame.segmentados ?? f.segmentados,
+        eosinofilos: exame.eosinofilos ?? f.eosinofilos,
+        basofilos: exame.basofilos ?? f.basofilos,
+        linfocitos: exame.linfocitos ?? f.linfocitos,
+        linfocitosAtipicos: exame.linfocitosAtipicos ?? f.linfocitosAtipicos,
+        monocitos: exame.monocitos ?? f.monocitos,
+        mieloblastos: exame.mieloblastos ?? f.mieloblastos,
+        outrasCelulas: exame.outrasCelulas ?? f.outrasCelulas,
+        celulasLinfoides: exame.celulasLinfoides ?? f.celulasLinfoides,
+        celulasMonocitoides: exame.celulasMonocitoides ?? f.celulasMonocitoides,
+        plaquetas: exame.plaquetas ?? f.plaquetas,
+        volumePlaquetarioMedio: exame.volumePlaquetarioMedio ?? f.volumePlaquetarioMedio,
         idPaciente: exame.idPaciente ?? f.idPaciente,
-        dataExame: exame.dataExame ?? f.dataExame,
+        data: exame.data ?? f.data,
         idResponsavel: exame.idResponsavel ?? f.idResponsavel,
         idPreceptor: exame.idPreceptor ?? f.idPreceptor,
       }));
@@ -107,7 +132,7 @@ export default function VisualizarExame({ route }) {
                 <Text style={styles.label}>{label}</Text>
                 <TextInput
                   style={styles.input}
-                  value={form[key]}
+                  value={String(form[key]) ?? ""}
                   onChangeText={(text) => handleChange(key, text)}
                   placeholder={"Digite o valor"}
                   keyboardType="numeric"
@@ -202,7 +227,7 @@ export default function VisualizarExame({ route }) {
         ])}
         {renderRow([
           ["ID Paciente", "idPaciente"],
-          ["Data do Exame", "dataExame"],
+          ["Data do Exame", "data"],
         ])}
 
         <TouchableOpacity
