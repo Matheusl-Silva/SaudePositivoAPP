@@ -50,79 +50,63 @@ export default function VisualizarExame({ route }) {
 
   useEffect(() => {
     const exame = route?.params?.exame;
-    if (!exame) return;
+    console.log("Exame recebido nos params:", exame);
+    if (!exame) {
+      console.log("AVISO: Nenhum exame foi passado nos parâmetros!");
+      return;
+    }
     // Força atualização completa do form
-    setForm({
+    const formData = {
       id: exame.id?.toString() || "",
-      hemacia: exame.hemacia || "",
-      hemoglobina: exame.hemoglobina || "",
-      hematocrito: exame.hematocrito || "",
-      vcm: exame.vcm || "",
-      hcm: exame.hcm || "",
-      chcm: exame.chcm || "",
-      rdw: exame.rdw || "",
-      leucocitos: exame.leucocitos || "",
-      neutrofilos: exame.neutrofilos || "",
-      blastos: exame.blastos || "",
-      promielocitos: exame.promielocitos || "",
-      mielocitos: exame.mielocitos || "",
-      metamielocitos: exame.metamielocitos || "",
-      bastonetes: exame.bastonetes || "",
-      segmentados: exame.segmentados || "",
-      eosinofilos: exame.eosinofilos || "",
-      basofilos: exame.basofilos || "",
-      linfocitos: exame.linfocitos || "",
-      linfocitosAtipicos: exame.linfocitosAtipicos || "",
-      monocitos: exame.monocitos || "",
-      mieloblastos: exame.mieloblastos || "",
-      outrasCelulas: exame.outrasCelulas || "",
-      celulasLinfoides: exame.celulasLinfoides || "",
-      celulasMonocitoides: exame.celulasMonocitoides || "",
-      plaquetas: exame.plaquetas || "",
-      volumePlaquetarioMedio: exame.volumePlaquetarioMedio || "",
+      hemacia: exame.hemacia?.toString() || "",
+      hemoglobina: exame.hemoglobina?.toString() || "",
+      hematocrito: exame.hematocrito?.toString() || "",
+      vcm: exame.vcm?.toString() || "",
+      hcm: exame.hcm?.toString() || "",
+      chcm: exame.chcm?.toString() || "",
+      rdw: exame.rdw?.toString() || "",
+      leucocitos: exame.leucocitos?.toString() || "",
+      neutrofilos: exame.neutrofilos?.toString() || "",
+      blastos: exame.blastos?.toString() || "",
+      promielocitos: exame.promielocitos?.toString() || "",
+      mielocitos: exame.mielocitos?.toString() || "",
+      metamielocitos: exame.metamielocitos?.toString() || "",
+      bastonetes: exame.bastonetes?.toString() || "",
+      segmentados: exame.segmentados?.toString() || "",
+      eosinofilos: exame.eosinofilos?.toString() || "",
+      basofilos: exame.basofilos?.toString() || "",
+      linfocitos: exame.linfocitos?.toString() || "",
+      linfocitosAtipicos: exame.linfocitosAtipicos?.toString() || "",
+      monocitos: exame.monocitos?.toString() || "",
+      mieloblastos: exame.mieloblastos?.toString() || "",
+      outrasCelulas: exame.outrasCelulas?.toString() || "",
+      celulasLinfoides: exame.celulasLinfoides?.toString() || "",
+      celulasMonocitoides: exame.celulasMonocitoides?.toString() || "",
+      plaquetas: exame.plaquetas?.toString() || "",
+      volumePlaquetarioMedio: exame.volumePlaquetarioMedio?.toString() || "",
       idResponsavel: exame.idResponsavel?.toString() || "",
       idPreceptor: exame.idPreceptor?.toString() || "",
       idPaciente: exame.idPaciente?.toString() || "",
       data: exame.data ? exame.data.split("T")[0] : "",
-    });
+    };
+    console.log("Form data preparado:", formData);
+    setForm(formData);
   }, [route]);
 
   const [loading, setLoading] = useState(false);
-  const [buttonColor, setButtonColor] = useState("#1827ff");
-  const [title, setTitle] = useState("Visualizar Exame");
-  const [editButtonIcon, setEditButtonIcon] = useState("pencil-sharp");
-  const [buttonText, setButtonText] = useState("Editar");
-  const [deleteButtonIcon, setDeleteButtonIcon] = useState("trash");
-  const [deleteButtonText, setDeleteButtonText] = useState("Excluir");
-
-  const [deleteButtonFunction, setDeleteButtonFunction] = useState(
-    () => () => {}
-  ); //Colocar a função de excluir exame aqui depois
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleChange = (name, value) => {
     setForm({ ...form, [name]: value });
   };
 
   const handlePressEdit = () => {
-    setButtonColor("#10b981");
-    setTitle("Editar Exame");
-    setEditButtonIcon("save");
-    setButtonText("Salvar");
-    setDeleteButtonIcon("close");
-    setDeleteButtonText("Cancelar");
-
-    setEditButtonFunction(() => handlePressSave);
-    setDeleteButtonFunction(() => handlePressCancel);
+    setIsEditing(true);
   };
-
-  const [editButtonFunction, setEditButtonFunction] = useState(
-    () => handlePressEdit
-  );
 
   const handlePressSave = async () => {
     setLoading(true);
     try {
-      //handleChange();
       console.log("form antes de enviar: ", form);
       const result = await atualizarExame({
         ...form,
@@ -130,36 +114,72 @@ export default function VisualizarExame({ route }) {
       });
       if (result.error) {
         Alert.alert("Erro", result.error);
+        setLoading(false);
         return;
       }
+      setLoading(false);
+      setIsEditing(false);
+      Alert.alert("Sucesso", "Exame atualizado com sucesso!", [
+        {
+          text: "OK",
+          onPress: () => navigation.goBack(),
+        },
+      ]);
     } catch (error) {
       console.error(error.response?.data || error.message);
+      setLoading(false);
       Alert.alert(
         "Erro",
         error.response?.data?.message ||
           "Ocorreu um erro ao tentar atualizar o exame."
       );
-      return;
-    } finally {
-      setLoading(false);
     }
-    Alert.alert("Sucesso", "Exame atualizado com sucesso!", [
-      {
-        text: "OK",
-        onPress: () => navigation.goBack(),
-      },
-    ]);
   };
 
   const handlePressCancel = () => {
-    setButtonColor("#1827ff");
-    setTitle("Visualizar Exame");
-    setEditButtonIcon("pencil-sharp");
-    setButtonText("Editar");
-    setDeleteButtonIcon("trash");
-    setDeleteButtonText("Excluir");
+    // Recarregar os dados originais do exame
+    const exame = route?.params?.exame;
+    if (exame) {
+      setForm({
+        id: exame.id?.toString() || "",
+        hemacia: exame.hemacia?.toString() || "",
+        hemoglobina: exame.hemoglobina?.toString() || "",
+        hematocrito: exame.hematocrito?.toString() || "",
+        vcm: exame.vcm?.toString() || "",
+        hcm: exame.hcm?.toString() || "",
+        chcm: exame.chcm?.toString() || "",
+        rdw: exame.rdw?.toString() || "",
+        leucocitos: exame.leucocitos?.toString() || "",
+        neutrofilos: exame.neutrofilos?.toString() || "",
+        blastos: exame.blastos?.toString() || "",
+        promielocitos: exame.promielocitos?.toString() || "",
+        mielocitos: exame.mielocitos?.toString() || "",
+        metamielocitos: exame.metamielocitos?.toString() || "",
+        bastonetes: exame.bastonetes?.toString() || "",
+        segmentados: exame.segmentados?.toString() || "",
+        eosinofilos: exame.eosinofilos?.toString() || "",
+        basofilos: exame.basofilos?.toString() || "",
+        linfocitos: exame.linfocitos?.toString() || "",
+        linfocitosAtipicos: exame.linfocitosAtipicos?.toString() || "",
+        monocitos: exame.monocitos?.toString() || "",
+        mieloblastos: exame.mieloblastos?.toString() || "",
+        outrasCelulas: exame.outrasCelulas?.toString() || "",
+        celulasLinfoides: exame.celulasLinfoides?.toString() || "",
+        celulasMonocitoides: exame.celulasMonocitoides?.toString() || "",
+        plaquetas: exame.plaquetas?.toString() || "",
+        volumePlaquetarioMedio: exame.volumePlaquetarioMedio?.toString() || "",
+        idResponsavel: exame.idResponsavel?.toString() || "",
+        idPreceptor: exame.idPreceptor?.toString() || "",
+        idPaciente: exame.idPaciente?.toString() || "",
+        data: exame.data ? exame.data.split("T")[0] : "",
+      });
+    }
+    setIsEditing(false);
+  };
 
-    setDeleteButtonFunction(() => () => {}); //Colocar a função de excluir exame aqui depois
+  const handleDelete = () => {
+    //Colocar a função de excluir exame aqui depois
+    Alert.alert("Info", "Função de exclusão ainda não implementada");
   };
 
   const renderRow = (inputs) => (
@@ -171,11 +191,15 @@ export default function VisualizarExame({ route }) {
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{label}</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    !isEditing && styles.inputDisabled,
+                  ]}
                   value={String(form[key]) ?? ""}
                   onChangeText={(text) => handleChange(key, text)}
                   placeholder={"Digite o valor"}
                   keyboardType="numeric"
+                  editable={isEditing}
                 />
               </View>
             </View>
@@ -194,7 +218,9 @@ export default function VisualizarExame({ route }) {
           <Ionicons name="arrow-back" size={24} color="#1827ff" />
         </TouchableOpacity>
         <Ionicons name="document-text" size={32} color="#1827ff" />
-        <Text style={styles.headerTitle}>{title}</Text>
+        <Text style={styles.headerTitle}>
+          {isEditing ? "Editar Exame" : "Visualizar Exame"}
+        </Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.formContainer}>
@@ -270,20 +296,37 @@ export default function VisualizarExame({ route }) {
           ["Data do Exame", "data"],
         ])}
 
-        <TouchableOpacity //Botão de edição
-          style={[styles.button, { backgroundColor: buttonColor }]}
-          onPress={editButtonFunction}
+        <TouchableOpacity
+          style={[
+            styles.button,
+            { backgroundColor: isEditing ? "#10b981" : "#1827ff" },
+          ]}
+          onPress={isEditing ? handlePressSave : handlePressEdit}
+          disabled={loading}
         >
-          <Ionicons name={editButtonIcon} size={20} color="#fff" />
-          <Text style={styles.buttonText}>{buttonText}</Text>
+          <Ionicons
+            name={isEditing ? "save" : "pencil-sharp"}
+            size={20}
+            color="#fff"
+          />
+          <Text style={styles.buttonText}>
+            {loading ? "Salvando..." : isEditing ? "Salvar" : "Editar"}
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity //Botão de exclusão
+        <TouchableOpacity
           style={[styles.button, { backgroundColor: "#cc2121", marginTop: 5 }]}
-          onPress={deleteButtonFunction}
+          onPress={isEditing ? handlePressCancel : handleDelete}
+          disabled={loading}
         >
-          <Ionicons name={deleteButtonIcon} size={20} color="#fff" />
-          <Text style={styles.buttonText}>{deleteButtonText}</Text>
+          <Ionicons
+            name={isEditing ? "close" : "trash"}
+            size={20}
+            color="#fff"
+          />
+          <Text style={styles.buttonText}>
+            {isEditing ? "Cancelar" : "Excluir"}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -348,6 +391,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     backgroundColor: "#f8f8f8",
+  },
+  inputDisabled: {
+    backgroundColor: "#e8e8e8",
+    color: "#666",
   },
   button: {
     flexDirection: "row",

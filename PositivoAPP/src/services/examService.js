@@ -66,11 +66,11 @@ export async function atualizarExame(exame) {
     celulasLinfoides: exame.celulasLinfoides,
     celulasMonocitoides: exame.celulasMonocitoides,
     plaquetas: exame.plaquetas,
-    volumePlaquetarioMedio: exame.volumeplaquetariomedio,
-    idResponsavel: exame.id_responsavel,
-    idPreceptor: exame.id_preceptor,
-    idPaciente: exame.id_paciente,
-    dataExame: exame.data_exame,
+    volplaquetariomedio: exame.volumePlaquetarioMedio,
+    idResponsavel: exame.idResponsavel,
+    idPreceptor: exame.idPreceptor,
+    idPaciente: exame.idPaciente,
+    data: exame.data,
   };
 
   const response = await api.put(`/exameHemato/${exame.id}`, payload);
