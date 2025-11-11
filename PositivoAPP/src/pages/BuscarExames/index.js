@@ -56,7 +56,6 @@ export default function BuscarExames() {
   };
 
   const handleView = (exame) => {
-    console.log("Exame na view de lista: ", exame);
     navigation.navigate("VisualizarExame", { exame });
   };
 

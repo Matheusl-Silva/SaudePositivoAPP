@@ -5,14 +5,17 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { atualizarExame } from "../../services/examService";
 
 export default function VisualizarExame({ route }) {
   const navigation = useNavigation();
   const [form, setForm] = useState({
+    id: "",
     hemacia: "",
     hemoglobina: "",
     hematocrito: "",
@@ -46,45 +49,45 @@ export default function VisualizarExame({ route }) {
   });
 
   useEffect(() => {
-    if (route && route.params && route.params.exame) {
-      const exame = route.params.exame;
-      console.log("Exame na view de ecição", exame);''
-      setForm((f) => ({
-        ...f,
-        hemacia: exame.hemacia ?? f.hemacia,
-        hemoglobina: exame.hemoglobina ?? f.hemoglobina,  
-        hematocrito: exame.hematocrito ?? f.hematocrito,
-        vcm: exame.vcm ?? f.vcm,
-        hcm: exame.hcm ?? f.hcm,
-        chcm: exame.chcm ?? f.chcm,
-        rdw: exame.rdw ?? f.rdw,
-        leucocitos: exame.leucocitos ?? f.leucocitos,
-        neutrofilos: exame.neutrofilos ?? f.neutrofilos,
-        blastos: exame.blastos ?? f.blastos,
-        promielocitos: exame.promielocitos ?? f.promielocitos,
-        mielocitos: exame.mielocitos ?? f.mielocitos,
-        metamielocitos: exame.metamielocitos ?? f.metamielocitos,
-        bastonetes: exame.bastonetes ?? f.bastonetes,
-        segmentados: exame.segmentados ?? f.segmentados,
-        eosinofilos: exame.eosinofilos ?? f.eosinofilos,
-        basofilos: exame.basofilos ?? f.basofilos,
-        linfocitos: exame.linfocitos ?? f.linfocitos,
-        linfocitosAtipicos: exame.linfocitosAtipicos ?? f.linfocitosAtipicos,
-        monocitos: exame.monocitos ?? f.monocitos,
-        mieloblastos: exame.mieloblastos ?? f.mieloblastos,
-        outrasCelulas: exame.outrasCelulas ?? f.outrasCelulas,
-        celulasLinfoides: exame.celulasLinfoides ?? f.celulasLinfoides,
-        celulasMonocitoides: exame.celulasMonocitoides ?? f.celulasMonocitoides,
-        plaquetas: exame.plaquetas ?? f.plaquetas,
-        volumePlaquetarioMedio: exame.volumePlaquetarioMedio ?? f.volumePlaquetarioMedio,
-        idPaciente: exame.idPaciente ?? f.idPaciente,
-        data: exame.data ?? f.data,
-        idResponsavel: exame.idResponsavel ?? f.idResponsavel,
-        idPreceptor: exame.idPreceptor ?? f.idPreceptor,
-      }));
-    }
+    const exame = route?.params?.exame;
+    if (!exame) return;
+    // Força atualização completa do form
+    setForm({
+      id: exame.id?.toString() || "",
+      hemacia: exame.hemacia || "",
+      hemoglobina: exame.hemoglobina || "",
+      hematocrito: exame.hematocrito || "",
+      vcm: exame.vcm || "",
+      hcm: exame.hcm || "",
+      chcm: exame.chcm || "",
+      rdw: exame.rdw || "",
+      leucocitos: exame.leucocitos || "",
+      neutrofilos: exame.neutrofilos || "",
+      blastos: exame.blastos || "",
+      promielocitos: exame.promielocitos || "",
+      mielocitos: exame.mielocitos || "",
+      metamielocitos: exame.metamielocitos || "",
+      bastonetes: exame.bastonetes || "",
+      segmentados: exame.segmentados || "",
+      eosinofilos: exame.eosinofilos || "",
+      basofilos: exame.basofilos || "",
+      linfocitos: exame.linfocitos || "",
+      linfocitosAtipicos: exame.linfocitosAtipicos || "",
+      monocitos: exame.monocitos || "",
+      mieloblastos: exame.mieloblastos || "",
+      outrasCelulas: exame.outrasCelulas || "",
+      celulasLinfoides: exame.celulasLinfoides || "",
+      celulasMonocitoides: exame.celulasMonocitoides || "",
+      plaquetas: exame.plaquetas || "",
+      volumePlaquetarioMedio: exame.volumePlaquetarioMedio || "",
+      idResponsavel: exame.idResponsavel?.toString() || "",
+      idPreceptor: exame.idPreceptor?.toString() || "",
+      idPaciente: exame.idPaciente?.toString() || "",
+      data: exame.data ? exame.data.split("T")[0] : "",
+    });
   }, [route]);
 
+  const [loading, setLoading] = useState(false);
   const [buttonColor, setButtonColor] = useState("#1827ff");
   const [title, setTitle] = useState("Visualizar Exame");
   const [editButtonIcon, setEditButtonIcon] = useState("pencil-sharp");
@@ -108,7 +111,44 @@ export default function VisualizarExame({ route }) {
     setDeleteButtonIcon("close");
     setDeleteButtonText("Cancelar");
 
+    setEditButtonFunction(() => handlePressSave);
     setDeleteButtonFunction(() => handlePressCancel);
+  };
+
+  const [editButtonFunction, setEditButtonFunction] = useState(
+    () => handlePressEdit
+  );
+
+  const handlePressSave = async () => {
+    setLoading(true);
+    try {
+      //handleChange();
+      console.log("form antes de enviar: ", form);
+      const result = await atualizarExame({
+        ...form,
+        id: route.params.exame.id,
+      });
+      if (result.error) {
+        Alert.alert("Erro", result.error);
+        return;
+      }
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      Alert.alert(
+        "Erro",
+        error.response?.data?.message ||
+          "Ocorreu um erro ao tentar atualizar o exame."
+      );
+      return;
+    } finally {
+      setLoading(false);
+    }
+    Alert.alert("Sucesso", "Exame atualizado com sucesso!", [
+      {
+        text: "OK",
+        onPress: () => navigation.goBack(),
+      },
+    ]);
   };
 
   const handlePressCancel = () => {
@@ -230,14 +270,15 @@ export default function VisualizarExame({ route }) {
           ["Data do Exame", "data"],
         ])}
 
-        <TouchableOpacity
+        <TouchableOpacity //Botão de edição
           style={[styles.button, { backgroundColor: buttonColor }]}
-          onPress={handlePressEdit}
+          onPress={editButtonFunction}
         >
           <Ionicons name={editButtonIcon} size={20} color="#fff" />
           <Text style={styles.buttonText}>{buttonText}</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+
+        <TouchableOpacity //Botão de exclusão
           style={[styles.button, { backgroundColor: "#cc2121", marginTop: 5 }]}
           onPress={deleteButtonFunction}
         >

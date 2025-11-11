@@ -192,4 +192,6 @@ router.post("/", hematoController.CreateHemato);
  */
 router.delete("/:idExame", hematoController.deleteHemato);
 
+router.put("/:idExame", hematoController.updateHemato);
+
 module.exports = router;

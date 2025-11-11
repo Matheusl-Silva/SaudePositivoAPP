@@ -88,3 +88,64 @@ exports.delete = (id) => {
     );
   });
 };
+
+exports.update = (id, data) => {
+  return new Promise((resolve, reject) => {
+    const query = `UPDATE exame_hematologia SET
+      id_responsavel = ?,
+      id_preceptor = ?,
+      id_paciente = ?,
+      ddata_exame = ?,
+      nhemacia = ?,
+      nhemoglobina = ?,
+      nhematocrito = ?,
+      nvcm = ?,
+      nhcm = ?,
+      nchcm = ?,
+      nrdw = ?,
+      nleucocitos = ?,
+      nblastos = ?,
+      npromielocitos = ?,
+      nmielocitos = ?,
+      nmetamielocitos = ?,
+      nbastonetes = ?,
+      nsegmentados = ?,
+      neosinofilos = ?,
+      nbasofilos = ?,
+      nplaquetas = ?,
+      nvolume_plaquetario_medio = ?,
+      nneutrofilos = ?
+    WHERE id = ?`;
+
+    const values = [
+      data.idResponsavel,
+      data.idPreceptor,
+      data.idPaciente,
+      data.data,
+      data.hemacia,
+      data.hemoglobina,
+      data.hematocrito,
+      data.vcm,
+      data.hcm,
+      data.chcm,
+      data.rdw,
+      data.leucocitos,
+      data.blastos,
+      data.promielocitos,
+      data.mielocitos,
+      data.metamielocitos,
+      data.bastonetes,
+      data.segmentados,
+      data.eosinofilos,
+      data.basofilos,
+      data.plaquetas,
+      data.volplaquetariomedio,
+      data.neutrofilos,
+      id,
+    ];
+
+    db.query(query, values, (err, result) => {
+      err ? reject(err) : resolve(result);
+    });
+  });
+};
