@@ -3,7 +3,6 @@ const db = require("../database/connection");
 exports.findByRegistroPaciente = (registroPaciente) => {
   return new Promise((resolve, reject) => {
     const query =
-      //"SELECT id, ddata_exame, id_preceptor, id_responsavel FROM exame_hematologia WHERE id_paciente = ? ORDER BY ddata_exame DESC";
       "SELECT * FROM exame_hematologia WHERE id_paciente = ? ORDER BY ddata_exame DESC";
 
     db.query(query, [registroPaciente], (err, results) => {
@@ -42,8 +41,9 @@ exports.create = (data) => {
                   id_responsavel, id_preceptor, id_paciente, ddata_exame,
                   nhemacia, nhemoglobina, nhematocrito, nvcm, nhcm, nchcm, nrdw, nleucocitos,
                   nblastos, npromielocitos, nmielocitos, nmetamielocitos, nbastonetes, nsegmentados,
-                  neosinofilos, nbasofilos, nplaquetas, nvolume_plaquetario_medio, nneutrofilos
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                  neosinofilos, nbasofilos, nlinfocitos, nlinfocitos_atipicos, nmonocitos, nmieloblastos,
+                  noutras_celulas, ncelulas_linfoides, ncelulas_monocitoides, nplaquetas, nvolume_plaquetario_medio, nneutrofilos
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const values = [
       data.id_responsavel,
@@ -66,6 +66,13 @@ exports.create = (data) => {
       data.segmentados,
       data.eosinofilos,
       data.basofilos,
+      data.linfocitos,
+      data.linfocitosAtipicos,
+      data.monocitos,
+      data.mieloblastos,
+      data.outrasCelulas,
+      data.celulasLinfoides,
+      data.celulasMonocitoides,
       data.plaquetas,
       data.volplaquetariomedio,
       data.neutrofilos,
@@ -112,6 +119,13 @@ exports.update = (id, data) => {
       nsegmentados = ?,
       neosinofilos = ?,
       nbasofilos = ?,
+      nlinfocitos = ?,
+      nlinfocitos_atipicos = ?,
+      nmonocitos = ?,
+      nmieloblastos = ?,
+      noutras_celulas = ?,
+      ncelulas_linfoides = ?,
+      ncelulas_monocitoides = ?,
       nplaquetas = ?,
       nvolume_plaquetario_medio = ?,
       nneutrofilos = ?
@@ -138,6 +152,13 @@ exports.update = (id, data) => {
       data.segmentados,
       data.eosinofilos,
       data.basofilos,
+      data.linfocitos,
+      data.linfocitosAtipicos,
+      data.monocitos,
+      data.mieloblastos,
+      data.outrasCelulas,
+      data.celulasLinfoides,
+      data.celulasMonocitoides,
       data.plaquetas,
       data.volplaquetariomedio,
       data.neutrofilos,

@@ -50,7 +50,6 @@ export default function VisualizarExame({ route }) {
 
   useEffect(() => {
     const exame = route?.params?.exame;
-    console.log("Exame recebido nos params:", exame);
     if (!exame) {
       console.log("AVISO: Nenhum exame foi passado nos parâmetros!");
       return;
@@ -89,7 +88,6 @@ export default function VisualizarExame({ route }) {
       idPaciente: exame.idPaciente?.toString() || "",
       data: exame.data ? exame.data.split("T")[0] : "",
     };
-    console.log("Form data preparado:", formData);
     setForm(formData);
   }, [route]);
 
@@ -107,7 +105,6 @@ export default function VisualizarExame({ route }) {
   const handlePressSave = async () => {
     setLoading(true);
     try {
-      console.log("form antes de enviar: ", form);
       const result = await atualizarExame({
         ...form,
         id: route.params.exame.id,

@@ -59,7 +59,6 @@ export default function InserirExame() {
     }
 
     setLoading(true);
-    console.log(form);
     try {
       await cadastrarExame(form);
     } catch (error) {

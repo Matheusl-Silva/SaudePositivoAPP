@@ -67,9 +67,7 @@ export default function BuscarExames() {
         style: "destructive",
         onPress: async () => {
           try {
-            console.log("Exame id: ", exame.id);
             const result = await deletarExame(exame.id);
-            console.log("result:", result);
             if (result.error) {
               Alert.alert("Erro", result.error);
               return;
