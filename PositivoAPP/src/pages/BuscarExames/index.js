@@ -119,7 +119,8 @@ export default function BuscarExames() {
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         {exames.map((exame) => (
           <View key={exame.id} style={styles.exameCard}>
-            <Text style={styles.exameTitle}>Data: {exame.data}</Text>
+            <Text style={styles.exameTitle}>Número: {exame.id}</Text>
+            <Text style={styles.exameTitle}>Data: {new Date(exame.data).toLocaleDateString('pt-BR')}</Text>
             <Text>Responsável: {exame.idResponsavel}</Text>
             <Text>Preceptor: {exame.idPreceptor}</Text>
 

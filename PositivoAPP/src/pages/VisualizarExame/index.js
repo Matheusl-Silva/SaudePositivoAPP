@@ -86,7 +86,7 @@ export default function VisualizarExame({ route }) {
       idResponsavel: exame.idResponsavel?.toString() || "",
       idPreceptor: exame.idPreceptor?.toString() || "",
       idPaciente: exame.idPaciente?.toString() || "",
-      data: exame.data ? exame.data.split("T")[0] : "",
+      data: new Date(exame.data).toLocaleDateString('pt-BR'),
     };
     setForm(formData);
   }, [route]);
@@ -168,7 +168,7 @@ export default function VisualizarExame({ route }) {
         idResponsavel: exame.idResponsavel?.toString() || "",
         idPreceptor: exame.idPreceptor?.toString() || "",
         idPaciente: exame.idPaciente?.toString() || "",
-        data: exame.data ? exame.data.split("T")[0] : "",
+        data: new Date(exame.data).toLocaleDateString('pt-BR'),
       });
     }
     setIsEditing(false);
