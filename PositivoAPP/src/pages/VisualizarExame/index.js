@@ -10,7 +10,7 @@ import {
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { atualizarExame } from "../../services/examService";
+import { atualizarExame, deletarExame } from "../../services/examService";
 
 export default function VisualizarExame({ route }) {
   const navigation = useNavigation();
@@ -86,7 +86,7 @@ export default function VisualizarExame({ route }) {
       idResponsavel: exame.idResponsavel?.toString() || "",
       idPreceptor: exame.idPreceptor?.toString() || "",
       idPaciente: exame.idPaciente?.toString() || "",
-      data: new Date(exame.data).toLocaleDateString('pt-BR'),
+      data: new Date(exame.data).toLocaleDateString("pt-BR"),
     };
     setForm(formData);
   }, [route]);
@@ -119,7 +119,7 @@ export default function VisualizarExame({ route }) {
       Alert.alert("Sucesso", "Exame atualizado com sucesso!", [
         {
           text: "OK",
-          onPress: () => navigation.goBack(),
+          onPress: () =>  navigation.navigate("BuscarExames", {idPaciente: form.idPaciente}),
         },
       ]);
     } catch (error) {
@@ -168,15 +168,36 @@ export default function VisualizarExame({ route }) {
         idResponsavel: exame.idResponsavel?.toString() || "",
         idPreceptor: exame.idPreceptor?.toString() || "",
         idPaciente: exame.idPaciente?.toString() || "",
-        data: new Date(exame.data).toLocaleDateString('pt-BR'),
+        data: new Date(exame.data).toLocaleDateString("pt-BR"),
       });
     }
     setIsEditing(false);
   };
 
   const handleDelete = () => {
-    //Colocar a função de excluir exame aqui depois
-    Alert.alert("Info", "Função de exclusão ainda não implementada");
+    const exame = route?.params?.exame;
+    Alert.alert("Confirmar", `Excluir exame de número ${exame.id}?`, [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Excluir",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const result = await deletarExame(exame.id);
+            if (result.error) {
+              Alert.alert("Erro", result.error);
+              return;
+            }
+            //setExames(exames.filter((e) => e.id !== exame.id));
+            Alert.alert("Sucesso", "Exame excluído!");
+            navigation.navigate("BuscarExames", {idPaciente: form.idPaciente});
+          } catch (error) {
+            Alert.alert("Erro", "Não foi possível excluir o exame.");
+            console.log("Erro ao excluir exame: ", error);
+          }
+        },
+      },
+    ]);
   };
 
   const renderRow = (inputs) => (
@@ -188,10 +209,7 @@ export default function VisualizarExame({ route }) {
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{label}</Text>
                 <TextInput
-                  style={[
-                    styles.input,
-                    !isEditing && styles.inputDisabled,
-                  ]}
+                  style={[styles.input, !isEditing && styles.inputDisabled]}
                   value={String(form[key]) ?? ""}
                   onChangeText={(text) => handleChange(key, text)}
                   placeholder={"Digite o valor"}

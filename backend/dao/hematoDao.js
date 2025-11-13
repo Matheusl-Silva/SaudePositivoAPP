@@ -6,6 +6,7 @@ exports.findByRegistroPaciente = (registroPaciente) => {
       "SELECT * FROM exame_hematologia WHERE id_paciente = ? ORDER BY ddata_exame DESC";
 
     db.query(query, [registroPaciente], (err, results) => {
+      console.log("Results API: ", results);
       err ? reject(err) : resolve(results);
     });
   });

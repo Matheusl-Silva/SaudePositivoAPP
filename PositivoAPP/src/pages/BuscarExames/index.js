@@ -7,13 +7,18 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState, useCallback } from "react";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { buscarTodosExamesPaciente,  deletarExame} from "../../services/examService";
+import {
+  buscarTodosExamesPaciente,
+  deletarExame,
+} from "../../services/examService";
 
-export default function BuscarExames() {
-  const [idPaciente, setIdPaciente] = useState("");
+export default function BuscarExames({ route }) {
+  const [idPaciente, setIdPaciente] = useState(
+    () => route?.params?.idPaciente || ""
+  );
   const [exames, setExames] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,25 +26,25 @@ export default function BuscarExames() {
 
   const carregarExames = async () => {
     setLoading(true);
-    try {
-      const data = await buscarTodosExamesPaciente(idPaciente);
-      if (data.length === 0) {
-        setError("Nenhum exame encontrado para este paciente.");
-        return;
-      } else {
-        setError("");
-      }
-      return data;
-    } catch (error) {
-      console.error(error.response?.data || error.message);
-      Alert.alert(
-        "Erro",
-        "Erro ao listar exames do paciente. Tente novamente."
-      );
-    } finally {
-      setLoading(false);
+    const data = await buscarTodosExamesPaciente(idPaciente);
+    if (data?.length === 0) {
+      setError("Nenhum exame encontrado para este paciente.");
+      return;
+    } else {
+      setError("");
     }
+    setLoading(false);
+    return data;
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (route?.params?.idPaciente) {
+        console.log("Passou aqui pelo usefocuseffect");
+        handleSearch();
+      }
+    }, [])
+  );
 
   useEffect(() => {
     if (idPaciente) carregarExames();
@@ -52,7 +57,16 @@ export default function BuscarExames() {
       return;
     }
 
-    setExames(await carregarExames());
+    try {
+      const exames = await carregarExames();
+      if (exames.length > 0) {
+        console.log("vasco");
+        setExames(exames);
+      }
+    } catch (e) {
+      setError("Nenhum exame encontrado para este paciente.");
+      setExames([]);
+    }
   };
 
   const handleView = (exame) => {
@@ -120,7 +134,9 @@ export default function BuscarExames() {
         {exames.map((exame) => (
           <View key={exame.id} style={styles.exameCard}>
             <Text style={styles.exameTitle}>Número: {exame.id}</Text>
-            <Text style={styles.exameTitle}>Data: {new Date(exame.data).toLocaleDateString('pt-BR')}</Text>
+            <Text style={styles.exameTitle}>
+              Data: {new Date(exame.data).toLocaleDateString("pt-BR")}
+            </Text>
             <Text>Responsável: {exame.idResponsavel}</Text>
             <Text>Preceptor: {exame.idPreceptor}</Text>
 

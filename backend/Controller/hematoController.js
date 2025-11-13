@@ -8,7 +8,7 @@ exports.getByRegistro = async (req, res) => {
     if (exames.length === 0) {
       return res
         .status(404)
-        .json({ error: "Nenhum exame encontrado para esse paciente" });
+        .json({ error: "Nenhum exame encontrado para este paciente" });
     }
     res.json(exames);
   } catch (err) {

@@ -83,41 +83,46 @@ export async function deletarExame(idExame) {
 }
 
 export async function buscarTodosExamesPaciente(idPaciente) {
-  const response = await api.get(`/exameHemato/${idPaciente}`);
-  const examesFormatados = response.data.map((e) => ({
-    id: e.id,
-    hemacia: e.nhemacia,
-    hemoglobina: e.nhemoglobina,
-    hematocrito: e.nhematocrito,
-    vcm: e.nvcm,
-    hcm: e.nhcm,
-    chcm: e.nchcm,
-    rdw: e.nrdw,
-    leucocitos: e.nleucocitos,
-    neutrofilos: e.nneutrofilos,
-    blastos: e.nblastos,
-    promielocitos: e.npromielocitos,
-    mielocitos: e.nmielocitos,
-    metamielocitos: e.nmetamielocitos,
-    bastonetes: e.nbastonetes,
-    segmentados: e.nsegmentados,
-    eosinofilos: e.neosinofilos,
-    basofilos: e.nbasofilos,
-    linfocitos: e.nlinfocitos,
-    linfocitosAtipicos: e.nlinfocitos_atipicos,
-    monocitos: e.nmonocitos,
-    mieloblastos: e.nmieloblastos,
-    outrasCelulas: e.noutras_celulas,
-    celulasLinfoides: e.ncelulas_linfoides,
-    celulasMonocitoides: e.ncelulas_monocitoides,
-    plaquetas: e.nplaquetas,
-    volumePlaquetarioMedio: e.nvolume_plaquetario_medio,
-    data: e.ddata_exame,
-    idPreceptor: e.id_preceptor,
-    idResponsavel: e.id_responsavel,
-    idPaciente: e.id_paciente
-  }));
-  return examesFormatados;
+  try {
+    const response = await api.get(`/exameHemato/${idPaciente}`);
+    const examesFormatados = response.data.map((e) => ({
+      id: e.id,
+      hemacia: e.nhemacia,
+      hemoglobina: e.nhemoglobina,
+      hematocrito: e.nhematocrito,
+      vcm: e.nvcm,
+      hcm: e.nhcm,
+      chcm: e.nchcm,
+      rdw: e.nrdw,
+      leucocitos: e.nleucocitos,
+      neutrofilos: e.nneutrofilos,
+      blastos: e.nblastos,
+      promielocitos: e.npromielocitos,
+      mielocitos: e.nmielocitos,
+      metamielocitos: e.nmetamielocitos,
+      bastonetes: e.nbastonetes,
+      segmentados: e.nsegmentados,
+      eosinofilos: e.neosinofilos,
+      basofilos: e.nbasofilos,
+      linfocitos: e.nlinfocitos,
+      linfocitosAtipicos: e.nlinfocitos_atipicos,
+      monocitos: e.nmonocitos,
+      mieloblastos: e.nmieloblastos,
+      outrasCelulas: e.noutras_celulas,
+      celulasLinfoides: e.ncelulas_linfoides,
+      celulasMonocitoides: e.ncelulas_monocitoides,
+      plaquetas: e.nplaquetas,
+      volumePlaquetarioMedio: e.nvolume_plaquetario_medio,
+      data: e.ddata_exame,
+      idPreceptor: e.id_preceptor,
+      idResponsavel: e.id_responsavel,
+      idPaciente: e.id_paciente,
+    }));
+    return examesFormatados;
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    Alert.alert("Erro", "Erro ao listar exames do paciente. Tente novamente.");
+  }
 }
 
 export async function buscarExame(idExame) {
