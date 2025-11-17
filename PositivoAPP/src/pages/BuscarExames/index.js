@@ -60,7 +60,6 @@ export default function BuscarExames({ route }) {
     try {
       const exames = await carregarExames();
       if (exames.length > 0) {
-        console.log("vasco");
         setExames(exames);
       }
     } catch (e) {
@@ -115,7 +114,7 @@ export default function BuscarExames({ route }) {
           style={styles.input}
           value={idPaciente}
           onChangeText={setIdPaciente}
-          placeholder="Digite o ID do paciente"
+          placeholder="Digite o Número do Paciente"
           keyboardType="numeric"
         />
         <TouchableOpacity

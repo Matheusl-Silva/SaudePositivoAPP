@@ -307,7 +307,7 @@ export default function VisualizarExame({ route }) {
           ["ID Preceptor", "idPreceptor"],
         ])}
         {renderRow([
-          ["ID Paciente", "idPaciente"],
+          ["Numero do Paciente", "idPaciente"],
           ["Data do Exame", "data"],
         ])}
 

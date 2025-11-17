@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const hematoController = require("../Controller/hematoController");
+const { verifyJWT, verifyAdmin } = require("../middlewares/authMiddlewares");
 
 /**
  * @swagger
@@ -74,7 +75,7 @@ const hematoController = require("../Controller/hematoController");
  *       404:
  *         description: Nenhum exame encontrado para esse paciente
  */
-router.get("/:idPaciente", hematoController.getByRegistro);
+router.get("/:idPaciente", verifyJWT, hematoController.getByRegistro);
 
 /**
  * @swagger
@@ -99,7 +100,7 @@ router.get("/:idPaciente", hematoController.getByRegistro);
  *       404:
  *         description: Exame não encontrado
  */
-router.get("/listar/:idExame", hematoController.getById);
+router.get("/listar/:idExame", verifyJWT, hematoController.getById);
 
 /**
  * @swagger
@@ -167,7 +168,7 @@ router.get("/listar/:idExame", hematoController.getById);
  *       500:
  *         description: Erro interno ao criar o exame
  */
-router.post("/", hematoController.CreateHemato);
+router.post("/", verifyJWT, hematoController.CreateHemato);
 
 /**
  * @swagger
@@ -190,8 +191,8 @@ router.post("/", hematoController.CreateHemato);
  *       500:
  *         description: Erro ao excluir exame
  */
-router.delete("/:idExame", hematoController.deleteHemato);
+router.delete("/:idExame", verifyJWT, verifyAdmin, hematoController.deleteHemato);
 
-router.put("/:idExame", hematoController.updateHemato);
+router.put("/:idExame", verifyJWT, verifyAdmin, hematoController.updateHemato);
 
 module.exports = router;

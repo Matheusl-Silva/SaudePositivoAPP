@@ -7,10 +7,12 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { cadastrarExame } from "../../services/examService";
+import DropDownPicker from "react-native-dropdown-picker";
+import { buscarTodosUsuarios } from "../../services/userService";
 
 export default function InserirExame() {
   const navigation = useNavigation();
@@ -47,6 +49,26 @@ export default function InserirExame() {
     data: "",
   });
   const [loading, setLoading] = useState(false);
+  const [usuarios, setUsuarios] = useState([]);
+  const [openResponsavel, setOpenResponsavel] = useState(false);
+  const [openPreceptor, setOpenPreceptor] = useState(false);
+
+  useEffect(() => {
+    const carregarUsuarios = async () => {
+      try {
+        const lista = await buscarTodosUsuarios();
+        setUsuarios(lista);
+      } catch (error) {
+        console.error("Erro ao carregar usuários para seleção de exame", error);
+        Alert.alert(
+          "Erro",
+          "Não foi possível carregar a lista de usuários. Tente novamente mais tarde."
+        );
+      }
+    };
+
+    carregarUsuarios();
+  }, []);
 
   const handleChange = (name, value) => {
     setForm({ ...form, [name]: value });
@@ -54,7 +76,7 @@ export default function InserirExame() {
 
   const handleSave = async () => {
     if (!form.id_paciente || !form.data) {
-      Alert.alert("Erro", "ID do paciente e Data do Exame são obrigatórios.");
+      Alert.alert("Erro", "Número do Paciente e Data do Exame são obrigatórios.");
       return;
     }
 
@@ -176,12 +198,69 @@ export default function InserirExame() {
         ])}
 
         <Text style={styles.sectionTitle}>Identificação</Text>
+
+        <View style={[styles.identificacaoContainer, { zIndex: 3000 }]}>
+          <Text style={styles.label}>Responsável</Text>
+          <DropDownPicker
+            open={openResponsavel}
+            value={form.id_responsavel}
+            items={usuarios.map((u) => ({ label: u.nome, value: u.id }))}
+            setOpen={setOpenResponsavel}
+            setValue={(callback) => {
+              const value = callback(form.id_responsavel);
+              handleChange("id_responsavel", value);
+            }}
+            listMode="SCROLLVIEW"
+            placeholder="Selecione o responsável"
+            style={styles.dropdownStyle}
+            containerStyle={styles.dropdownContainer}
+            textStyle={{ fontSize: 16, color: form.id_responsavel ? "#333" : "#a1a1a1" }}
+            showTickIcon={true}
+            TickIconComponent={({ style }) => (
+              <Ionicons
+                name="checkmark-circle"
+                size={20}
+                color="#10b981"
+                style={style}
+              />
+            )}
+            autoScroll={true}
+            disabled={usuarios.length === 0}
+          />
+        </View>
+
+        <View style={[styles.identificacaoContainer, { zIndex: 2000 }]}>
+          <Text style={styles.label}>Preceptor</Text>
+          <DropDownPicker
+            open={openPreceptor}
+            value={form.id_preceptor}
+            items={usuarios.map((u) => ({ label: u.nome, value: u.id }))}
+            setOpen={setOpenPreceptor}
+            setValue={(callback) => {
+              const value = callback(form.id_preceptor);
+              handleChange("id_preceptor", value);
+            }}
+            listMode="SCROLLVIEW"
+            placeholder="Selecione o preceptor"
+            style={styles.dropdownStyle}
+            containerStyle={styles.dropdownContainer}
+            textStyle={{ fontSize: 16, color: form.id_preceptor ? "#333" : "#a1a1a1" }}
+            showTickIcon={true}
+            TickIconComponent={({ style }) => (
+              <Ionicons
+                name="checkmark-circle"
+                size={20}
+                color="#10b981"
+                style={style}
+              />
+            )}
+            autoScroll={true}
+            disabled={usuarios.length === 0}
+          />
+        </View>
+
         {renderRow([
-          ["ID Responsável", "id_responsavel"],
-          ["ID Preceptor", "id_preceptor"],
-        ])}
-        {renderRow([
-          ["ID Paciente *", "id_paciente"],
+          ["Numero do Paciente *", "id_paciente"],
           ["Data do Exame *", "data"],
         ])}
 
@@ -207,7 +286,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 60,
+    marginTop: 20,
     marginBottom: 20,
   },
   backButton: {
@@ -223,6 +302,20 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     paddingBottom: 100,
+  },
+  dropdownContainer: {
+    height: 50,
+  },
+  dropdownStyle: {
+    backgroundColor: "#f8f8f8",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    minHeight: 50,
+  },
+  identificacaoContainer: {
+    marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 18,

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pacienteController = require("../Controller/pacienteController");
+const { verifyJWT, verifyAdmin } = require("../middlewares/authMiddlewares");
 
 /**
  * @swagger
@@ -46,7 +47,7 @@ const pacienteController = require("../Controller/pacienteController");
  *               items:
  *                 $ref: '#/components/schemas/Paciente'
  */
-router.get("/", pacienteController.getAllPacientes);
+router.get("/", verifyJWT, verifyAdmin, pacienteController.getAllPacientes);
 
 /**
  * @swagger
@@ -71,7 +72,7 @@ router.get("/", pacienteController.getAllPacientes);
  *       404:
  *         description: Paciente não encontrado
  */
-router.get("/:idPaciente", pacienteController.getPacienteById);
+router.get("/:idPaciente", verifyJWT, pacienteController.getPacienteById);
 
 /**
  * @swagger
@@ -113,7 +114,7 @@ router.post("/verificar-email", pacienteController.verificarEmail);
  *       201:
  *         description: Paciente criado com sucesso
  */
-router.post("/", pacienteController.createPaciente);
+router.post("/", verifyJWT, verifyAdmin, pacienteController.createPaciente);
 
 /**
  * @swagger
@@ -137,7 +138,7 @@ router.post("/", pacienteController.createPaciente);
  *       200:
  *         description: Paciente atualizado com sucesso
  */
-router.put("/:idPaciente", pacienteController.updatePaciente);
+router.put("/:idPaciente", verifyJWT, verifyAdmin, pacienteController.updatePaciente);
 
 /**
  * @swagger
@@ -155,7 +156,7 @@ router.put("/:idPaciente", pacienteController.updatePaciente);
  *       200:
  *         description: Paciente deletado com sucesso
  */
-router.delete("/:idPaciente", pacienteController.deletePaciente);
+router.delete("/:idPaciente", verifyJWT, verifyAdmin, pacienteController.deletePaciente);
 
 /**
  * @swagger
@@ -174,6 +175,6 @@ router.delete("/:idPaciente", pacienteController.deletePaciente);
  *       200:
  *         description: Lista de exames do paciente
  */
-router.get("/buscaExames/:idPaciente", pacienteController.BuscarGeralExames);
+router.get("/buscaExames/:idPaciente", verifyJWT, pacienteController.BuscarGeralExames);
 
 module.exports = router;

@@ -25,4 +25,13 @@ const verifyJWT = (req, res, next) => {
   }
 };
 
-module.exports = verifyJWT;
+const verifyAdmin = (req, res, next) => {
+  if (!req.userAdmin) {
+    return res.status(403).json({ 
+      mensagem: "Acesso negado. Apenas administradores podem realizar esta ação." 
+    });
+  }
+  next();
+};
+
+module.exports = { verifyJWT, verifyAdmin };

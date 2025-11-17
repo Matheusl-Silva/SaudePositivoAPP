@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bioquimicaController = require("../Controller/bioquimicaController");
+const { verifyJWT, verifyAdmin } = require("../middlewares/authMiddlewares");
 
 /**
  * @swagger
@@ -98,7 +99,7 @@ const bioquimicaController = require("../Controller/bioquimicaController");
  *       404:
  *         description: Nenhum exame encontrado para esse paciente
  */
-router.get("/:idPaciente", bioquimicaController.getByRegistro);
+router.get("/:idPaciente", verifyJWT, bioquimicaController.getByRegistro);
 
 /**
  * @swagger
@@ -123,7 +124,7 @@ router.get("/:idPaciente", bioquimicaController.getByRegistro);
  *       404:
  *         description: Exame não encontrado
  */
-router.get("/listar/:idExame", bioquimicaController.getById);
+router.get("/listar/:idExame", verifyJWT, bioquimicaController.getById);
 
 /**
  * @swagger
@@ -200,6 +201,6 @@ router.get("/listar/:idExame", bioquimicaController.getById);
  *       500:
  *         description: Erro interno ao criar exame
  */
-router.post("/", bioquimicaController.CreateBio);
+router.post("/", verifyJWT, bioquimicaController.CreateBio);
 
 module.exports = router;

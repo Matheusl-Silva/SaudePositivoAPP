@@ -81,7 +81,12 @@ exports.login = async (req, res) => {
 
     return res.status(200).json({
       token: token,
-      usuario: { id: usuario.id, nome: usuario.cnome, email: usuario.cemail },
+      usuario: { 
+        id: usuario.id, 
+        nome: usuario.cnome, 
+        email: usuario.cemail,
+        admin: usuario.cadmin 
+      },
     });
   } catch (err) {
     console.error("Erro no login:", err);

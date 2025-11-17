@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const usuarioController = require("../Controller/usuarioController");
+const { verifyJWT, verifyAdmin } = require("../middlewares/authMiddlewares");
 
 /**
  * @swagger
@@ -120,7 +121,7 @@ const usuarioController = require("../Controller/usuarioController");
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get("/", usuarioController.getAllUsuarios);
+router.get("/", verifyJWT, verifyAdmin, usuarioController.getAllUsuarios);
 
 /**
  * @swagger
@@ -153,7 +154,7 @@ router.get("/", usuarioController.getAllUsuarios);
  *       500:
  *         description: Erro ao buscar usuário
  */
-router.get("/:idUsuario", usuarioController.getUsuariobyId);
+router.get("/:idUsuario", verifyJWT, usuarioController.getUsuariobyId);
 
 /**
  * @swagger
@@ -287,7 +288,7 @@ router.post("/", usuarioController.createUsuario);
  *       500:
  *         description: Erro ao atualizar usuário
  */
-router.put("/:idUsuario", usuarioController.updateUsuario);
+router.put("/:idUsuario", verifyJWT, verifyAdmin, usuarioController.updateUsuario);
 
 /**
  * @swagger
@@ -319,6 +320,6 @@ router.put("/:idUsuario", usuarioController.updateUsuario);
  *       500:
  *         description: Erro ao deletar usuário
  */
-router.delete("/:idUsuario", usuarioController.deleteUsuario);
+router.delete("/:idUsuario", verifyJWT, verifyAdmin, usuarioController.deleteUsuario);
 
 module.exports = router;

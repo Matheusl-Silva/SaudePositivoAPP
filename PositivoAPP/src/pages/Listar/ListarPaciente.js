@@ -15,12 +15,15 @@ import {
   buscarTodosPacientes,
   deletarPaciente,
 } from "../../services/pacienteService";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function PacienteList() {
   const [pacientes, setPacientes] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const { isAdmin } = useAuth();
+  const userIsAdmin = isAdmin();
 
   const carregarPacientes = async () => {
     try {
@@ -48,13 +51,19 @@ export default function PacienteList() {
     }, [])
   );
 
-  const filteredPacientes = pacientes.filter((paciente) => {
-    const nome = paciente?.cnome?.toLowerCase() || "";
-    const email = paciente?.cemail?.toLowerCase() || "";
-    const cpf = paciente?.ccpf || "";
-    const search = searchText.toLowerCase();
-    return nome.includes(search) || email.includes(search) || cpf.includes(searchText);
-  });
+  const filteredPacientes = userIsAdmin
+    ? pacientes.filter((paciente) => {
+        const nome = paciente?.cnome?.toLowerCase() || "";
+        const email = paciente?.cemail?.toLowerCase() || "";
+        const cpf = paciente?.ccpf || "";
+        const search = searchText.toLowerCase();
+        return (
+          nome.includes(search) ||
+          email.includes(search) ||
+          cpf.includes(searchText)
+        );
+      })
+    : pacientes;
 
   const handleEditPaciente = (paciente) => {
     navigation.navigate("Atualizar Paciente", { paciente });
@@ -82,32 +91,50 @@ export default function PacienteList() {
   const renderPacienteItem = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.info}>
-        <Text style={styles.nome}>{item.cnome}</Text>
-        <Text style={styles.text}>📧 {item.cemail}</Text>
-        <Text style={styles.text}>📞 {item.ctelefone}</Text>
-        <Text style={styles.text}>🆔 CPF: {item.ccpf}</Text>
-        <Text style={styles.text}>🕑 Período: {item.cperiodo}</Text>
-        {item.cmedicamento ? (
-          <Text style={styles.text}>💊Medicamento: {item.cmedicamento}</Text>
-        ) : null}
-        {item.cpatologia ? (
-          <Text style={styles.text}>⚕️Patologia: {item.cpatologia}</Text>
-        ) : null}
+        {userIsAdmin ? (
+          <>
+            <Text style={styles.nome}>{item.cnome}</Text>
+            <Text style={styles.text}>📧 {item.cemail}</Text>
+            <Text style={styles.text}>📞 {item.ctelefone}</Text>
+            <Text style={styles.text}>🆔 CPF: {item.ccpf}</Text>
+            <Text style={styles.text}>🕑 Período: {item.cperiodo}</Text>
+            {item.cmedicamento ? (
+              <Text style={styles.text}>
+                💊Medicamento: {item.cmedicamento}
+              </Text>
+            ) : null}
+            {item.cpatologia ? (
+              <Text style={styles.text}>⚕️Patologia: {item.cpatologia}</Text>
+            ) : null}
+          </>
+        ) : (
+          <>
+            <Text style={styles.nome}>Paciente #{item.id}</Text>
+            <Text style={styles.text}>
+              💊 Toma medicamento: {item.cmedicamento ? "Sim" : "Não"}
+            </Text>
+            <Text style={styles.text}>
+              ⚕️ Possui patologia: {item.cpatologia ? "Sim" : "Não"}
+            </Text>
+          </>
+        )}
       </View>
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={styles.editButton}
-          onPress={() => handleEditPaciente(item)}
-        >
-          <Ionicons name="pencil" size={16} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => handleDeletePaciente(item)}
-        >
-          <Ionicons name="trash" size={16} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      {userIsAdmin && (
+        <View style={styles.actions}>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => handleEditPaciente(item)}
+          >
+            <Ionicons name="pencil" size={16} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => handleDeletePaciente(item)}
+          >
+            <Ionicons name="trash" size={16} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 
@@ -145,20 +172,22 @@ export default function PacienteList() {
         </Text>
       </View>
 
-      <View style={styles.searchContainer}>
-        <Ionicons
-          name="search"
-          size={20}
-          color="#666"
-          style={styles.searchIcon}
-        />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar por nome, email ou CPF..."
-          value={searchText}
-          onChangeText={setSearchText}
-        />
-      </View>
+      {userIsAdmin && (
+        <View style={styles.searchContainer}>
+          <Ionicons
+            name="search"
+            size={20}
+            color="#666"
+            style={styles.searchIcon}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar por nome, email ou CPF..."
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+        </View>
+      )}
 
       <FlatList
         data={filteredPacientes}
@@ -169,13 +198,15 @@ export default function PacienteList() {
         showsVerticalScrollIndicator={false}
       />
 
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.getParent().navigate("Cadastrar Paciente")}
-      >
-        <Ionicons name="person-add" size={20} color="#fff" />
-        <Text style={styles.addButtonText}>Novo Paciente</Text>
-      </TouchableOpacity>
+      {userIsAdmin && (
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigation.getParent().navigate("Cadastrar Paciente")}
+        >
+          <Ionicons name="person-add" size={20} color="#fff" />
+          <Text style={styles.addButtonText}>Novo Paciente</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

@@ -10,8 +10,10 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { loginUsuario } from "../../services/userService";
+import { useAuth } from "../../contexts/AuthContext";
 
-export default function Login({ onLogin, navigation }) {
+export default function Login({ navigation }) {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,16 +26,18 @@ export default function Login({ onLogin, navigation }) {
     setLoading(true);
     try {
       const data = await loginUsuario(email, senha);
-      onLogin({
+
+      await login({
         id: data.usuario.id,
         nome: data.usuario.nome,
         email: data.usuario.email,
         admin: data.usuario.admin,
+        token: data.token,
       });
     } catch (error) {
       console.error(error.response?.data || error.message);
       const errorMessage =
-        error.response?.data?.message ||
+        error.response?.data?.error ||
         "Email ou senha incorretos. Tente novamente.";
       Alert.alert("Erro no Login", errorMessage);
     } finally {

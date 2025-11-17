@@ -5,6 +5,7 @@ import { Platform } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "../contexts/AuthContext";
 
 import Home from "../pages/Home";
 import Exames from "../pages/Exames";
@@ -88,7 +89,10 @@ function ExamesStack() {
   );
 }
 
-export default function MainNavigator({ onLogout, usuarioLogado }) {
+export default function MainNavigator({ usuarioLogado }) {
+  const { logout, isAdmin } = useAuth();
+  const userIsAdmin = isAdmin();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -134,7 +138,7 @@ export default function MainNavigator({ onLogout, usuarioLogado }) {
       <Tab.Screen
         name="Home"
         children={(props) => (
-          <Home {...props} onLogout={onLogout} usuarioLogado={usuarioLogado} />
+          <Home {...props} onLogout={logout} usuarioLogado={usuarioLogado} />
         )}
         options={{
           title: "Início",
@@ -149,6 +153,7 @@ export default function MainNavigator({ onLogout, usuarioLogado }) {
           headerTitle: "Exames Laboratoriais",
         }}
       />
+      {/* Apenas admins podem ver e gerenciar pacientes */}
       <Tab.Screen
         name="Pacientes"
         component={PacienteStack}
@@ -157,30 +162,39 @@ export default function MainNavigator({ onLogout, usuarioLogado }) {
           headerTitle: "Lista de Pacientes",
         }}
       />
-      <Tab.Screen
-        name="Usuários"
-        component={UsuariosStack}
-        options={{
-          title: "Usuários",
-          headerTitle: "Lista de Usuários",
-        }}
-      />
-      <Tab.Screen
-        name="Cadastrar Paciente"
-        component={CadastroPaciente}
-        options={{
-          title: "Novo Paciente",
-          headerTitle: "Cadastrar Paciente",
-        }}
-      />
-      <Tab.Screen
-        name="Cadastrar Usuário"
-        component={CadastroUsuario}
-        options={{
-          title: "Novo Usuário",
-          headerTitle: "Cadastrar Usuário",
-        }}
-      />
+      {/* Apenas admins podem ver e gerenciar usuários */}
+      {userIsAdmin && (
+        <Tab.Screen
+          name="Usuários"
+          component={UsuariosStack}
+          options={{
+            title: "Usuários",
+            headerTitle: "Lista de Usuários",
+          }}
+        />
+      )}
+      {/* Apenas admins podem cadastrar pacientes */}
+      {userIsAdmin && (
+        <Tab.Screen
+          name="Cadastrar Paciente"
+          component={CadastroPaciente}
+          options={{
+            title: "Novo Paciente",
+            headerTitle: "Cadastrar Paciente",
+          }}
+        />
+      )}
+      {/* Apenas admins podem cadastrar usuários */}
+      {userIsAdmin && (
+        <Tab.Screen
+          name="Cadastrar Usuário"
+          component={CadastroUsuario}
+          options={{
+            title: "Novo Usuário",
+            headerTitle: "Cadastrar Usuário",
+          }}
+        />
+      )}
     </Tab.Navigator>
   );
 }
