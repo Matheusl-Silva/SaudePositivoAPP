@@ -116,6 +116,8 @@ export async function buscarTodosExamesPaciente(idPaciente) {
       data: e.ddata_exame,
       idPreceptor: e.id_preceptor,
       idResponsavel: e.id_responsavel,
+      nomePreceptor: e.nome_preceptor || `ID: ${e.id_preceptor}`,
+      nomeResponsavel: e.nome_responsavel || `ID: ${e.id_responsavel}`,
       idPaciente: e.id_paciente,
     }));
     return examesFormatados;

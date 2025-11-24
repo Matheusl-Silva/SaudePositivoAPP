@@ -14,6 +14,9 @@ import {
   buscarTodosExamesPaciente,
   deletarExame,
 } from "../../services/examService";
+import { useIsFocused } from "@react-navigation/native";
+import { AdminOnly } from "../../components/AdminOnly";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function BuscarExames({ route }) {
   const [idPaciente, setIdPaciente] = useState(
@@ -22,6 +25,8 @@ export default function BuscarExames({ route }) {
   const [exames, setExames] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const isFocused = useIsFocused();
+  const { isAdmin } = useAuth();
   const navigation = useNavigation();
 
   const carregarExames = async () => {
@@ -136,8 +141,8 @@ export default function BuscarExames({ route }) {
             <Text style={styles.exameTitle}>
               Data: {new Date(exame.data).toLocaleDateString("pt-BR")}
             </Text>
-            <Text>Responsável: {exame.idResponsavel}</Text>
-            <Text>Preceptor: {exame.idPreceptor}</Text>
+            <Text>Responsável: {exame.nomeResponsavel}</Text>
+            <Text>Preceptor: {exame.nomePreceptor}</Text>
 
             <View style={{ flexDirection: "row", marginTop: 10, gap: 10 }}>
               <TouchableOpacity
@@ -147,13 +152,15 @@ export default function BuscarExames({ route }) {
                 <Ionicons name="eye" size={16} color="#fff" />
                 <Text style={styles.smallButtonText}>Visualizar</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.smallButton, { backgroundColor: "#cc2121" }]}
-                onPress={() => handleDelete(exame)}
-              >
-                <Ionicons name="trash" size={16} color="#fff" />
-                <Text style={styles.smallButtonText}>Excluir</Text>
-              </TouchableOpacity>
+              <AdminOnly>
+                <TouchableOpacity
+                  style={[styles.smallButton, { backgroundColor: "#cc2121" }]}
+                  onPress={() => handleDelete(exame)}
+                >
+                  <Ionicons name="trash" size={16} color="#fff" />
+                  <Text style={styles.smallButtonText}>Excluir</Text>
+                </TouchableOpacity>
+              </AdminOnly>
             </View>
           </View>
         ))}

@@ -9,11 +9,16 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { atualizarExame, deletarExame } from "../../services/examService";
+import { buscarTodosUsuarios } from "../../services/userService";
+import { AdminOnly } from "../../components/AdminOnly";
+import { useAuth } from "../../contexts/AuthContext";
+import DropDownPicker from "react-native-dropdown-picker";
 
 export default function VisualizarExame({ route }) {
   const navigation = useNavigation();
+  const routeParams = useRoute().params;
   const [form, setForm] = useState({
     id: "",
     hemacia: "",
@@ -49,7 +54,7 @@ export default function VisualizarExame({ route }) {
   });
 
   useEffect(() => {
-    const exame = route?.params?.exame;
+    const exame = routeParams?.exame;
     if (!exame) {
       console.log("AVISO: Nenhum exame foi passado nos parâmetros!");
       return;
@@ -89,17 +94,45 @@ export default function VisualizarExame({ route }) {
       data: new Date(exame.data).toLocaleDateString("pt-BR"),
     };
     setForm(formData);
-  }, [route]);
+  }, [routeParams]);
 
-  const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { isAdmin } = useAuth();
+  const [userIsAdmin, setUserIsAdmin] = useState(false);
+  const [usuarios, setUsuarios] = useState([]);
+  const [openResponsavel, setOpenResponsavel] = useState(false);
+  const [openPreceptor, setOpenPreceptor] = useState(false);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        // Check admin status
+        const adminStatus = await isAdmin();
+        setUserIsAdmin(adminStatus);
+        
+        // Load users for dropdowns
+        const listaUsuarios = await buscarTodosUsuarios();
+        setUsuarios(listaUsuarios);
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+        Alert.alert("Erro", "Não foi possível carregar os dados necessários.");
+      }
+    };
+    
+    loadData();
+  }, [isAdmin]);
 
   const handleChange = (name, value) => {
     setForm({ ...form, [name]: value });
   };
 
   const handlePressEdit = () => {
-    setIsEditing(true);
+    if (userIsAdmin) {
+      setIsEditing(true);
+    } else {
+      Alert.alert("Acesso Negado", "Apenas administradores podem editar exames.");
+    }
   };
 
   const handlePressSave = async () => {
@@ -107,7 +140,7 @@ export default function VisualizarExame({ route }) {
     try {
       const result = await atualizarExame({
         ...form,
-        id: route.params.exame.id,
+        id: routeParams.exame.id,
       });
       if (result.error) {
         Alert.alert("Erro", result.error);
@@ -119,7 +152,7 @@ export default function VisualizarExame({ route }) {
       Alert.alert("Sucesso", "Exame atualizado com sucesso!", [
         {
           text: "OK",
-          onPress: () =>  navigation.navigate("BuscarExames", {idPaciente: form.idPaciente}),
+          onPress: () => navigation.navigate("BuscarExames", { idPaciente: form.idPaciente }),
         },
       ]);
     } catch (error) {
@@ -135,7 +168,7 @@ export default function VisualizarExame({ route }) {
 
   const handlePressCancel = () => {
     // Recarregar os dados originais do exame
-    const exame = route?.params?.exame;
+    const exame = routeParams?.exame;
     if (exame) {
       setForm({
         id: exame.id?.toString() || "",
@@ -175,7 +208,7 @@ export default function VisualizarExame({ route }) {
   };
 
   const handleDelete = () => {
-    const exame = route?.params?.exame;
+    const exame = routeParams?.exame;
     Alert.alert("Confirmar", `Excluir exame de número ${exame.id}?`, [
       { text: "Cancelar", style: "cancel" },
       {
@@ -190,7 +223,7 @@ export default function VisualizarExame({ route }) {
             }
             //setExames(exames.filter((e) => e.id !== exame.id));
             Alert.alert("Sucesso", "Exame excluído!");
-            navigation.navigate("BuscarExames", {idPaciente: form.idPaciente});
+            navigation.navigate("BuscarExames", { idPaciente: form.idPaciente });
           } catch (error) {
             Alert.alert("Erro", "Não foi possível excluir o exame.");
             console.log("Erro ao excluir exame: ", error);
@@ -209,12 +242,12 @@ export default function VisualizarExame({ route }) {
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{label}</Text>
                 <TextInput
-                  style={[styles.input, !isEditing && styles.inputDisabled]}
+                  style={[styles.input, (!isEditing || !userIsAdmin) && styles.inputDisabled]}
                   value={String(form[key]) ?? ""}
                   onChangeText={(text) => handleChange(key, text)}
                   placeholder={"Digite o valor"}
                   keyboardType="numeric"
-                  editable={isEditing}
+                  editable={isEditing && userIsAdmin}
                 />
               </View>
             </View>
@@ -302,53 +335,111 @@ export default function VisualizarExame({ route }) {
         ])}
 
         <Text style={styles.sectionTitle}>Identificação</Text>
-        {renderRow([
-          ["ID Responsável", "idResponsavel"],
-          ["ID Preceptor", "idPreceptor"],
-        ])}
+        <View style={[styles.identificacaoContainer, { zIndex: 3000, marginBottom: 20 }]}>
+          <Text style={styles.label}>Responsável</Text>
+          <DropDownPicker
+            open={openResponsavel}
+            value={form.idResponsavel}
+            items={usuarios.map((u) => ({ label: u.nome, value: u.id }))}
+            setOpen={setOpenResponsavel}
+            setValue={(callback) => {
+              const value = callback(form.idResponsavel);
+              handleChange("idResponsavel", value);
+            }}
+            listMode="SCROLLVIEW"
+            placeholder="Selecione o responsável"
+            style={styles.dropdownStyle}
+            containerStyle={styles.dropdownContainer}
+            textStyle={{ fontSize: 16, color: form.idResponsavel ? "#333" : "#a1a1a1" }}
+            showTickIcon={true}
+            disabled={!isEditing || !userIsAdmin}
+            disableBorderRadius={false}
+          />
+        </View>
+
+        <View style={[styles.identificacaoContainer, { zIndex: 2000, marginBottom: 20 }]}>
+          <Text style={styles.label}>Preceptor</Text>
+          <DropDownPicker
+            open={openPreceptor}
+            value={form.idPreceptor}
+            items={usuarios.map((u) => ({ label: u.nome, value: u.id }))}
+            setOpen={setOpenPreceptor}
+            setValue={(callback) => {
+              const value = callback(form.idPreceptor);
+              handleChange("idPreceptor", value);
+            }}
+            listMode="SCROLLVIEW"
+            placeholder="Selecione o preceptor"
+            style={styles.dropdownStyle}
+            containerStyle={styles.dropdownContainer}
+            textStyle={{ fontSize: 16, color: form.idPreceptor ? "#333" : "#a1a1a1" }}
+            showTickIcon={true}
+            disabled={!isEditing || !userIsAdmin}
+            disableBorderRadius={false}
+          />
+        </View>
         {renderRow([
           ["Numero do Paciente", "idPaciente"],
           ["Data do Exame", "data"],
         ])}
 
-        <TouchableOpacity
-          style={[
-            styles.button,
-            { backgroundColor: isEditing ? "#10b981" : "#1827ff" },
-          ]}
-          onPress={isEditing ? handlePressSave : handlePressEdit}
-          disabled={loading}
-        >
-          <Ionicons
-            name={isEditing ? "save" : "pencil-sharp"}
-            size={20}
-            color="#fff"
-          />
-          <Text style={styles.buttonText}>
-            {loading ? "Salvando..." : isEditing ? "Salvar" : "Editar"}
-          </Text>
-        </TouchableOpacity>
+        {userIsAdmin && (
+          <TouchableOpacity
+            style={[
+              styles.button,
+              { backgroundColor: isEditing ? "#10b981" : "#1827ff" },
+            ]}
+            onPress={isEditing ? handlePressSave : handlePressEdit}
+            disabled={loading}
+          >
+            <Ionicons
+              name={isEditing ? "save" : "pencil-sharp"}
+              size={20}
+              color="#fff"
+            />
+            <Text style={styles.buttonText}>
+              {loading ? "Salvando..." : isEditing ? "Salvar" : "Editar"}
+            </Text>
+          </TouchableOpacity>
+        )}
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#cc2121", marginTop: 5 }]}
-          onPress={isEditing ? handlePressCancel : handleDelete}
-          disabled={loading}
-        >
-          <Ionicons
-            name={isEditing ? "close" : "trash"}
-            size={20}
-            color="#fff"
-          />
-          <Text style={styles.buttonText}>
-            {isEditing ? "Cancelar" : "Excluir"}
-          </Text>
-        </TouchableOpacity>
+        {userIsAdmin && (
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: "#cc2121", marginTop: 5 }]}
+            onPress={isEditing ? handlePressCancel : handleDelete}
+            disabled={loading}
+          >
+            <Ionicons
+              name={isEditing ? "close" : "trash"}
+              size={20}
+              color="#fff"
+            />
+            <Text style={styles.buttonText}>
+              {isEditing ? "Cancelar" : "Excluir"}
+            </Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  identificacaoContainer: {
+    marginBottom: 15,
+    zIndex: 1,
+  },
+  dropdownStyle: {
+    borderColor: "#e2e8f0",
+    backgroundColor: "#f8fafc",
+    minHeight: 50,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+  },
+  dropdownContainer: {
+    marginTop: 5,
+    zIndex: 1000,
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",

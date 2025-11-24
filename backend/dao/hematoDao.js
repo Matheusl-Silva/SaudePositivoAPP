@@ -2,11 +2,21 @@ const db = require("../database/connection");
 
 exports.findByRegistroPaciente = (registroPaciente) => {
   return new Promise((resolve, reject) => {
-    const query =
-      "SELECT * FROM exame_hematologia WHERE id_paciente = ? ORDER BY ddata_exame DESC";
+    const query = `
+      SELECT 
+        e.*,
+        resp.cnome AS nome_responsavel,
+        prec.cnome AS nome_preceptor
+      FROM 
+        exame_hematologia e
+        LEFT JOIN usuario resp ON e.id_responsavel = resp.id
+        LEFT JOIN usuario prec ON e.id_preceptor = prec.id
+      WHERE 
+        e.id_paciente = ? 
+      ORDER BY 
+        e.ddata_exame DESC`;
 
     db.query(query, [registroPaciente], (err, results) => {
-      console.log("Results API: ", results);
       err ? reject(err) : resolve(results);
     });
   });
