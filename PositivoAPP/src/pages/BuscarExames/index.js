@@ -104,7 +104,7 @@ export default function BuscarExames({ route }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate("ExamesHome")}
           style={styles.backButton}
         >
           <Ionicons name="arrow-back" size={24} color="#1827ff" />
